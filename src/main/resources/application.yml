@@ -1,10 +1,12 @@
 spring:
-  application:
-    name=train:
+  server:
+    port: 8888
+#  application:
+#    name=train:
   datasource:
-    url: jdbc:mysql://localhost:3306/train_ticket_system?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/train?useSSL=false&serverTimezone=UTC
     username: root
-    password: ""  # Mật khẩu trống
+    password:  "" # Mật khẩu trống""
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:

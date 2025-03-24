@@ -1,4 +1,4 @@
-package com.tauhoa.train.services.impl;
+package com.tauhoa.train.services;
 
 import com.tauhoa.train.models.Seat;
 
