@@ -18,9 +18,6 @@ public class TripController {
     @Autowired
     TripService tripService;
 
-//    @PostMapping("")
-//    public ResponseEntity<?>
-
     @GetMapping("/ketqua")
     public ResponseEntity<?> getTripByDate(@PathVariable
                                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

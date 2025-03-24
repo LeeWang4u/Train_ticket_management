@@ -2,8 +2,6 @@ package com.tauhoa.train.services;
 
 import com.tauhoa.train.models.CarriageList;
 import com.tauhoa.train.repositories.CarriageListRepository;
-import com.tauhoa.train.services.impl.ICarriageListService;
-import com.tauhoa.train.services.impl.ICompartmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +9,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class CarriageListService implements ICarriageListService {
     private final CarriageListRepository carriageListRepository;
+
+    public CarriageListService(CarriageListRepository carriageListRepository){
+        this.carriageListRepository = carriageListRepository;
+    }
     @Override
     public Optional<CarriageList> getSeatById(int id) {
         return carriageListRepository.findById(id);
@@ -21,6 +23,6 @@ public class CarriageListService implements ICarriageListService {
 
     @Override
     public List<CarriageList> findAllCarriageListByIdTrip(int idTrip) {
-        return carriageListRepository.findAllByTrip(idTrip);
+        return carriageListRepository.findAllByTripId(idTrip);
     }
 }
