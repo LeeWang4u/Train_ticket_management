@@ -1,4 +1,8 @@
 package com.tauhoa.train.repositories;
 
-public interface PassengerRepository {
+import com.tauhoa.train.models.Passenger;
+import com.tauhoa.train.models.Train;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PassengerRepository extends JpaRepository<Passenger, Integer> {
 }

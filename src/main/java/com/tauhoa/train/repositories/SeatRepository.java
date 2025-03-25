@@ -12,10 +12,11 @@ public interface SeatRepository extends JpaRepository<Seat, Integer>{
             "JOIN s.carriageList cl " +
             "JOIN cl.trip t " +
             "WHERE t.tripId = :tripId")
-    List<Seat> findSeatsByTripId(@Param("tripId") int tripId);
+    List<Seat> findAllSeatsByTripId(@Param("tripId") int tripId);
 
     List<Seat> findByCarriageList_Trip_TripId(int tripId);
 
     List<Seat> getAllBySeatId(int seatId);
     Seat getSeatsBySeatId(int seatId);
+
 }
