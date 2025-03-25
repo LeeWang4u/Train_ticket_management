@@ -1,10 +1,33 @@
 package com.tauhoa.train.services;
 
-import com.tauhoa.train.services.impl.IStationService;
+import com.tauhoa.train.exceptions.DataNotFoundException;
+import com.tauhoa.train.models.Station;
+import com.tauhoa.train.repositories.StationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class StationService implements IStationService {
+    private final StationRepository stationRepository;
+
+    public StationService(StationRepository stationRepository){
+        this.stationRepository = stationRepository;
+    }
+    @Override
+    public Station getStation(int id) throws Exception{
+        Optional<Station>  optionalStation = stationRepository.findById(id);
+        if(optionalStation.isPresent()) {
+            return optionalStation.get();
+        }
+       throw new DataNotFoundException("Cannot find station with id =" + id);
+
+    }
+//    public List<Station> getStation(int id) {
+//        return stationRepository.findByStationId(id);
+//    }
+
 }
