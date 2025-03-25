@@ -11,7 +11,7 @@ import java.util.Optional;
 @Service
 //@RequiredArgsConstructor
 public class SeatService implements ISeatService {
-        private final SeatRepository seatRepository;
+    private final SeatRepository seatRepository;
 
     public SeatService(SeatRepository seatRepository){
         this.seatRepository = seatRepository;
