@@ -3,6 +3,7 @@ package com.tauhoa.train.models;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
@@ -34,12 +35,12 @@ public class Train {
     private Route route;
 
     @Column(name = "departure_time", nullable = false)
-    private LocalTime departureTime;
+    private LocalTime  departureTime;
 
     // Constructors
     public Train() {}
 
-    public Train(String trainName, BigDecimal listedPrice, String trainType, String trainStatus, int carriageNumber, Route route, LocalTime departureTime) {
+    public Train(String trainName, BigDecimal listedPrice, String trainType, String trainStatus, int carriageNumber, Route route, LocalTime  departureTime) {
         this.trainName = trainName;
         this.listedPrice = listedPrice;
         this.trainType = trainType;
@@ -106,11 +107,11 @@ public class Train {
         this.route = route;
     }
 
-    public LocalTime getDepartureTime() {
+    public LocalTime  getDepartureTime() {
         return departureTime;
     }
 
-    public void setDepartureTime(LocalTime departureTime) {
+    public void setDepartureTime(LocalTime  departureTime) {
         this.departureTime = departureTime;
     }
 
