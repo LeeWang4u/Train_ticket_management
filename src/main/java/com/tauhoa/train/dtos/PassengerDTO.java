@@ -18,12 +18,11 @@ public class PassengerDTO {
     @Pattern(regexp = "^[0-9]", message = "Số điện thoại chỉ được nhập số")
     private String Cccd;
 
-    private LocalDateTime purchaseTime;
 
     @NotBlank(message = "Họ và tên không được bỏ trống")
     @Pattern(regexp = "^[a-zA-Z]+$", message = "Họ và tên không được chứa các kí tự đặc biệt")
     private String FullName;
 
-    TicketType ticketType;
+    private TicketType ticketType;
 
 }

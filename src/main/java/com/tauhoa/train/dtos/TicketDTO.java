@@ -2,6 +2,7 @@ package com.tauhoa.train.dtos;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.tauhoa.train.models.*;
 import jakarta.persistence.Column;
@@ -18,36 +19,9 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TicketDTO {
+    @NotNull(message = "Thông tin người dùng không được để trống")
+    private UserDTO userDTO;
 
-
-
-    private LocalDateTime purchaseTime;
-
-    @NotNull(message = "Giá vé không được để trống")
-    @Min(value = 0, message = "Giá vé phải lớn hơn hoặc bằng 0")
-    private BigDecimal price;
-
-    @Min(value = 0, message = "Giảm giá phải lớn hơn hoặc bằng 0")
-    private BigDecimal discount;
-
-    @Min(value = 0, message = "Tổng tiền phải lớn hơn hoặc bằng 0")
-    private BigDecimal totalPrice;
-
-    @NotNull(message = "Trạng thái vé không được để trống")
-    @Size(max = 10, message = "Trạng thái vé không được dài quá 10 ký tự")
-    private String ticketStatus;
-
-    Passenger passengerId;
-
-    User userId;
-
-    Invoice invoiceId; // Có thể null nếu chưa có hóa đơn
-
-    Trip trip;
-
-    Seat seat;
-
-    Station departureStation;
-
-    Station arrivalStation;
+    @NotNull(message = "Danh sách vé không được để trống")
+    private List<TicketInformationDTO> ticketInformationDTO;
 }
