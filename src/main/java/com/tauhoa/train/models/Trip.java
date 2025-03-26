@@ -2,6 +2,7 @@ package com.tauhoa.train.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "trip")
@@ -17,7 +18,7 @@ public class Trip {
     private Train train;
 
     @Column(name = "trip_date", nullable = false)
-    private LocalDate tripDate;
+    private LocalDateTime tripDate;
 
     @Column(name = "trip_status", nullable = false, length = 50)
     private String tripStatus;
@@ -25,7 +26,7 @@ public class Trip {
     // Constructors
     public Trip() {}
 
-    public Trip(Train train, LocalDate tripDate, String tripStatus) {
+    public Trip(Train train, LocalDateTime tripDate, String tripStatus) {
         this.train = train;
         this.tripDate = tripDate;
         this.tripStatus = tripStatus;
@@ -48,11 +49,11 @@ public class Trip {
         this.train = train;
     }
 
-    public LocalDate getTripDate() {
+    public LocalDateTime getTripDate() {
         return tripDate;
     }
 
-    public void setTripDate(LocalDate tripDate) {
+    public void setTripDate(LocalDateTime tripDate) {
         this.tripDate = tripDate;
     }
 
