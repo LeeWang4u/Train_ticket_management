@@ -1,7 +1,7 @@
 package com.tauhoa.train.models;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "passenger")
@@ -19,7 +19,7 @@ public class Passenger {
     private String cccd;
 
     @Column(name = "dob", nullable = false)
-    private LocalDate dob;
+    private LocalDateTime dob;
 
     @ManyToOne
     @JoinColumn(name = "ticket_type_id", nullable = false)
@@ -28,7 +28,7 @@ public class Passenger {
     // Constructors
     public Passenger() {}
 
-    public Passenger(String fullname, String cccd, LocalDate dob, TicketType ticketType) {
+    public Passenger(String fullname, String cccd, LocalDateTime dob, TicketType ticketType) {
         this.fullname = fullname;
         this.cccd = cccd;
         this.dob = dob;
@@ -60,11 +60,11 @@ public class Passenger {
         this.cccd = cccd;
     }
 
-    public LocalDate getDob() {
+    public LocalDateTime getDob() {
         return dob;
     }
 
-    public void setDob(LocalDate dob) {
+    public void setDob(LocalDateTime dob) {
         this.dob = dob;
     }
 
