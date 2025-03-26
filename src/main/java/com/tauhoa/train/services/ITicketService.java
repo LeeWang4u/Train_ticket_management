@@ -11,5 +11,6 @@ public interface ITicketService {
     void save(TicketInformationDTO ticketDTO, User user, Passenger passenger);
     void update(String ticketStatus);
     Ticket findByTicketId(Integer ticketId);
-    List<Ticket> findByUser(User user);
+
+    List<Ticket> findTicketsByUserInfo(String cccd, String phone);
 }

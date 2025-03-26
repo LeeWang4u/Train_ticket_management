@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -23,6 +24,9 @@ public class TicketReservationDTO {
 
     @NotNull(message = "Ga đi không được để trống")
     private Station departureStationId;
+
+    @NotNull(message = "Thời gian khởi hành không được để trống")
+    private LocalDateTime departureTime;
 
     @NotNull(message = "Trạng thái không được để trống")
     private String reservationStatus;
