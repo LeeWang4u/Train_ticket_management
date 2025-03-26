@@ -4,6 +4,7 @@ import com.tauhoa.train.dtos.PassengerDTO;
 import com.tauhoa.train.dtos.TicketDTO;
 import com.tauhoa.train.dtos.TicketInformationDTO;
 import com.tauhoa.train.models.Passenger;
+import com.tauhoa.train.models.Ticket;
 import com.tauhoa.train.models.User;
 import com.tauhoa.train.services.PassengerService;
 import com.tauhoa.train.services.TicketService;
@@ -11,10 +12,9 @@ import com.tauhoa.train.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -41,5 +41,26 @@ public class TicketController {
         }catch (Exception e) {
             return ResponseEntity.status(500).body("Lỗi khi đặt vé: " + e.getMessage() + request);
         }
+    }
+
+    @GetMapping("/{ticketId}")
+    public ResponseEntity<Ticket> getTicketById(@PathVariable Integer ticketId) {
+        Ticket ticket = ticketService.findByTicketId(ticketId);
+        return ResponseEntity.ok(ticket);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<?> getTicketsByUser(
+            @RequestParam(required = false) String cccd,
+            @RequestParam(required = false) String phone) {
+
+        System.out.println("API /user được gọi với cccd=" + cccd + ", phone=" + phone);
+
+        if ((cccd == null || cccd.isEmpty()) && (phone == null || phone.isEmpty())) {
+            return ResponseEntity.badRequest().body("Vui lòng nhập CCCD và số điện thoại!");
+        }
+
+        List<Ticket> tickets = ticketService.findTicketsByUserInfo(cccd, phone);
+        return tickets.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(tickets);
     }
 }
