@@ -13,4 +13,8 @@ public class TicketReservationService implements ITicketReservationService {
         ticketReservation.setReservationStatus("Booked");
         ticketReservationRepository.save(ticketReservation);
     }
+
+    public TicketReservation getTicketReservation(int ticketId) {
+        return ticketReservationRepository.findByReservationId(ticketId);
+    }
 }

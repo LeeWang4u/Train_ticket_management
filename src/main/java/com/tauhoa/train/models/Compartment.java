@@ -1,75 +1,35 @@
 package com.tauhoa.train.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "compartment")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Compartment {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "compartment_id")
     private int compartmentId;
 
-    @Column(name = "compartment_type", nullable = false, length = 50)
-    private String compartmentType;
-
-    @Column(name = "compartment_name", nullable = false, length = 255)
+    @Column(name = "compartment_name", nullable = false)
     private String compartmentName;
+
+    @Column(name = "class_factor", nullable = false)
+    private BigDecimal classFactor;
 
     @Column(name = "seat_count", nullable = false)
     private int seatCount;
 
-    // Constructors
-    public Compartment() {}
-
-    public Compartment(String compartmentType, String compartmentName, int seatCount) {
-        this.compartmentType = compartmentType;
+    Compartment(String compartmentName, BigDecimal classFactor, int seatCount) {
         this.compartmentName = compartmentName;
+        this.classFactor = classFactor;
         this.seatCount = seatCount;
-    }
-
-    // Getters and Setters
-    public int getCompartmentId() {
-        return compartmentId;
-    }
-
-    public void setCompartmentId(int compartmentId) {
-        this.compartmentId = compartmentId;
-    }
-
-    public String getCompartmentType() {
-        return compartmentType;
-    }
-
-    public void setCompartmentType(String compartmentType) {
-        this.compartmentType = compartmentType;
-    }
-
-    public String getCompartmentName() {
-        return compartmentName;
-    }
-
-    public void setCompartmentName(String compartmentName) {
-        this.compartmentName = compartmentName;
-    }
-
-    public int getSeatCount() {
-        return seatCount;
-    }
-
-    public void setSeatCount(int seatCount) {
-        this.seatCount = seatCount;
-    }
-
-    // toString Method
-    @Override
-    public String toString() {
-        return "Compartment{" +
-                "compartmentId=" + compartmentId +
-                ", compartmentType='" + compartmentType + '\'' +
-                ", compartmentName='" + compartmentName + '\'' +
-                ", seatCount=" + seatCount +
-                '}';
     }
 }
