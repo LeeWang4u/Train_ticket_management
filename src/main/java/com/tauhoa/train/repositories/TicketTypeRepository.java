@@ -8,4 +8,6 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 public interface TicketTypeRepository extends JpaRepository<TicketType, Integer>{
+    @Override
+    List<TicketType> findAll();
 }
