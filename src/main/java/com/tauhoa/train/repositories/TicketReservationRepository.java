@@ -8,4 +8,5 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 public interface TicketReservationRepository extends JpaRepository<TicketReservation, Integer>{
+    TicketReservation findByReservationId(int ticketReservationId);
 }
