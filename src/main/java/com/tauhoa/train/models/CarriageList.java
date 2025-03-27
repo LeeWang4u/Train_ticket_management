@@ -1,11 +1,16 @@
 package com.tauhoa.train.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "carriage_list")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CarriageList {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "carriage_list_id")
@@ -19,46 +24,12 @@ public class CarriageList {
     @JoinColumn(name = "trip_id", nullable = false)
     private Trip trip;
 
-    // Constructors
-    public CarriageList() {}
+    @Column(name = "stt", nullable = false)
+    private int stt;
 
-    public CarriageList(Compartment compartment, Trip trip) {
+    CarriageList(Compartment compartment, Trip trip, int stt) {
         this.compartment = compartment;
         this.trip = trip;
-    }
-
-    // Getters and Setters
-    public int getCarriageListId() {
-        return carriageListId;
-    }
-
-    public void setCarriageListId(int carriageListId) {
-        this.carriageListId = carriageListId;
-    }
-
-    public Compartment getCompartment() {
-        return compartment;
-    }
-
-    public void setCompartment(Compartment compartment) {
-        this.compartment = compartment;
-    }
-
-    public Trip getTrip() {
-        return trip;
-    }
-
-    public void setTrip(Trip trip) {
-        this.trip = trip;
-    }
-
-    // toString Method
-    @Override
-    public String toString() {
-        return "CarriageList{" +
-                "carriageListId=" + carriageListId +
-                ", compartment=" + compartment +
-                ", trip=" + trip +
-                '}';
+        this.stt = stt;
     }
 }

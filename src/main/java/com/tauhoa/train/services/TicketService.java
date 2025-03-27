@@ -1,9 +1,7 @@
 package com.tauhoa.train.services;
 
 import com.tauhoa.train.dtos.TicketInformationDTO;
-import com.tauhoa.train.models.Passenger;
-import com.tauhoa.train.models.Ticket;
-import com.tauhoa.train.models.User;
+import com.tauhoa.train.models.*;
 import com.tauhoa.train.repositories.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,21 +18,18 @@ public class TicketService implements ITicketService {
     private TicketRepository ticketRepository;
 
     @Override
-    public void save(TicketInformationDTO ticketInformationDTO, User user, Passenger passenger) {
+    public void save(TicketInformationDTO ticketInformationDTO, Customer customer, Passenger passenger, Invoice invoice) {
         LocalDateTime date =LocalDateTime.now();
         Ticket ticket = new Ticket();
-        ticket.setUser(user);
+        ticket.setCustomer(customer);
         ticket.setPassenger(passenger);
-        ticket.setTicketStatus("pending");
-        ticket.setDiscount(new BigDecimal(0));
-        ticket.setArrivalStation(ticketInformationDTO.getTicketReservation().getArrivalStation());
-        ticket.setDepartureStation(ticketInformationDTO.getTicketReservation().getDepartureStation());
-        ticket.setInvoice(null);
+        ticket.setTicketStatus("Complete");
+        ticket.setDiscount(ticketInformationDTO.getDiscount());
+        ticket.setReservation(ticketInformationDTO.getTicketReservation());
+        ticket.setInvoice(invoice);
         ticket.setPrice(ticketInformationDTO.getPrice());
         ticket.setPurchaseTime(date);
-        ticket.setSeat(ticketInformationDTO.getTicketReservation().getSeat());
         ticket.setTotalPrice(ticketInformationDTO.getTotalPrice());
-        ticket.setTrip(ticketInformationDTO.getTicketReservation().getTrip());
         ticketRepository.save(ticket);
     }
 
@@ -49,7 +44,7 @@ public class TicketService implements ITicketService {
     }
 
     @Override
-    public List<Ticket> findByUser(User user){
+    public List<Ticket> findByCustomer(Customer customer){
         return null;
     }
 
