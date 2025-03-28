@@ -32,6 +32,7 @@ public class TicketController {
     @PostMapping("/confirmTicket")
     public ResponseEntity<String> bookTicket(@RequestBody @Valid TicketDTO request) {
         try {
+            System.out.println(request);
             Customer customer = customerService.save(request.getCustomerDTO());
             BigDecimal totalPrice = BigDecimal.ZERO;
             for (TicketInformationDTO res : request.getTicketInformationDTO()) {
