@@ -6,7 +6,10 @@ import com.tauhoa.train.dtos.TicketInformationDTO;
 import com.tauhoa.train.models.Customer;
 import com.tauhoa.train.models.Invoice;
 import com.tauhoa.train.models.Passenger;
-import com.tauhoa.train.services.*;
+import com.tauhoa.train.services.InvoiceService;
+import com.tauhoa.train.services.PassengerService;
+import com.tauhoa.train.services.TicketService;
+import com.tauhoa.train.services.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,14 +26,12 @@ import java.math.BigDecimal;
 public class TicketController {
     private final TicketService ticketService;
     private final InvoiceService invoiceService;
+    private final CustomerService userService;
     private final PassengerService passengerService;
-    private final CustomerService customerService;
-    private final TicketReservationService ticketReservationService;
     @PostMapping("/confirmTicket")
     public ResponseEntity<String> bookTicket(@RequestBody @Valid TicketDTO request) {
         try {
-            System.out.println(request);
-            Customer customer = customerService.save(request.getCustomerDTO());
+            Customer customer = userService.save(request.getCustomerDTO());
             BigDecimal totalPrice = BigDecimal.ZERO;
             for (TicketInformationDTO res : request.getTicketInformationDTO()) {
                 totalPrice = totalPrice.add(res.getTotalPrice());
@@ -42,7 +43,6 @@ public class TicketController {
                 passengerDTO.setCccd(res.getCccd());
                 passengerDTO.setFullName(res.getFullName());
                 Passenger passenger = passengerService.save(passengerDTO);
-                ticketReservationService.update(res.getTicketReservation());
                 ticketService.save(res, customer, passenger,invoice);
             }
 
