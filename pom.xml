@@ -49,9 +49,13 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
+<!--			<groupId>org.projectlombok</groupId>-->
+<!--			<artifactId>lombok</artifactId>-->
+<!--			<optional>true</optional>-->
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<version>1.18.30</version> <!-- Hoặc phiên bản mới nhất -->
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -78,10 +82,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -94,6 +94,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
+							<version>1.18.30</version> <!-- Hoặc phiên bản mới nhất -->
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
@@ -106,6 +107,7 @@
 						<exclude>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
+							<version>1.18.30</version> <!-- Hoặc phiên bản mới nhất -->
 						</exclude>
 					</excludes>
 				</configuration>

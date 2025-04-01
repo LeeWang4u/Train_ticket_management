@@ -1,7 +1,8 @@
 package com.tauhoa.train.services;
 
+import com.tauhoa.train.dtos.request.TrainInfoDTO;
+import com.tauhoa.train.dtos.response.TripResponseDTO;
 import com.tauhoa.train.models.Trip;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -10,4 +11,8 @@ public interface ITripService {
     Optional<Trip> getTrip(int id);
 
     List<Trip> findByTripDate(LocalDate tripDate);
+
+    List<TrainInfoDTO> getTrainInfoByStationAndDate(String stationName, LocalDate date);
+
+    List<TripResponseDTO> findTrips(String departureStation, String arrivalStation, LocalDate tripDate);
 }

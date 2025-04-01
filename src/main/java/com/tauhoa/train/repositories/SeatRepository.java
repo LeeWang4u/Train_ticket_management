@@ -19,4 +19,8 @@ public interface SeatRepository extends JpaRepository<Seat, Integer>{
     List<Seat> getAllBySeatId(int seatId);
     Seat getSeatsBySeatId(int seatId);
 
+    List<Seat> findByCarriageListCarriageListId(int carriageListId);
+
+    @Query("SELECT s FROM Seat s WHERE s.carriageList.carriageListId = :carriageListId ORDER BY s.seatNumber")
+    List<Seat> findByCarriageListId(@Param("carriageListId") int carriageListId);
 }
