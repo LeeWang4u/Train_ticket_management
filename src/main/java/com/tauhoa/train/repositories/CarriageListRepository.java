@@ -15,4 +15,17 @@ public interface CarriageListRepository extends JpaRepository<CarriageList, Inte
     List<CarriageList> findAllByTripId(@Param("tripId") int tripId);
     @Override
     Optional<CarriageList> findById(Integer id);
+
+    List<CarriageList> findByTripTripId(int tripId);
+
+    @Query("SELECT cl FROM CarriageList cl WHERE cl.trip.tripId = :tripId ORDER BY cl.stt")
+    List<CarriageList> findByTripId(@Param("tripId") int tripId);
+
+
+    // Tìm CarriageList theo tripId và stt
+    @Query("SELECT cl FROM CarriageList cl WHERE cl.trip.tripId = :tripId AND cl.stt = :stt")
+    Optional<CarriageList> findByTripIdAndStt(@Param("tripId") int tripId, @Param("stt") int stt);
+
+    @Query("SELECT cl FROM CarriageList cl WHERE cl.trip.tripId = :tripId AND cl.carriageListId = :carriageListId")
+    Optional<CarriageList> findByTripIdAndCarriageListId(@Param("tripId") int tripId, @Param("carriageListId") int carriageListId);
 }

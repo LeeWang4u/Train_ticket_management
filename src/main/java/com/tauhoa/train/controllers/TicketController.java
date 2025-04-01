@@ -28,10 +28,11 @@ public class TicketController {
     private final InvoiceService invoiceService;
     private final CustomerService userService;
     private final PassengerService passengerService;
+    private final CustomerService customerService;
     @PostMapping("/confirmTicket")
     public ResponseEntity<String> bookTicket(@RequestBody @Valid TicketDTO request) {
         try {
-            Customer customer = userService.save(request.getCustomerDTO());
+            Customer customer = customerService.save(request.getCustomerDTO());
             BigDecimal totalPrice = BigDecimal.ZERO;
             for (TicketInformationDTO res : request.getTicketInformationDTO()) {
                 totalPrice = totalPrice.add(res.getTotalPrice());
