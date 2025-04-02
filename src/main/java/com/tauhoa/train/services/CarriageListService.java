@@ -169,12 +169,15 @@ public class CarriageListService implements ICarriageListService {
                                 return resDepartureOrdinal < requestArrivalOrdinal && resArrivalOrdinal > requestDepartureOrdinal;
                             });
 
+                    // Xác định trạng thái ghế trong phản hồi dựa trên isAvailable
+                    String status = isAvailable ? "AVAILABLE" : "BOOKED";
+
                     return new SeatAvailabilityResponseDTO(
                             seat.getSeatId(),
                             seat.getSeatNumber(),
                             seat.getFloor(),
                             seat.getSeatFactor(),
-                            seat.getSeatStatus(),
+                            status, // Sử dụng trạng thái tính toán thay vì seat.getSeatStatus()
                             isAvailable
                     );
                 })
@@ -190,6 +193,75 @@ public class CarriageListService implements ICarriageListService {
                 seatDTOs
         );
     }
+//    @Transactional(readOnly = true)
+//    public CarriageSeatAvailabilityResponseDTO findSeatsAvailabilityByTripIdAndCarriageListId(
+//            int tripId, int carriageListId, int departureStationId, int arrivalStationId) {
+//        // Kiểm tra CarriageList có tồn tại và thuộc tripId
+//        CarriageList carriage = carriageListRepository.findByTripIdAndCarriageListId(tripId, carriageListId)
+//                .orElseThrow(() -> new IllegalArgumentException("No carriage found for tripId: " + tripId + " and carriageListId: " + carriageListId));
+//
+//        // Lấy danh sách ghế của toa
+//        List<Seat> seats = seatRepository.findByCarriageListId(carriage.getCarriageListId());
+//
+//        // Lấy danh sách vé của chuyến tàu
+//        List<TicketReservation> reservations = ticketReservationRepository.findByTripId(tripId);
+//
+//        // Lấy ordinalNumber của ga đi và ga đến trong yêu cầu
+//        TrainSchedule departureSchedule = trainScheduleRepository.findByTrainIdAndStationId(carriage.getTrip().getTrain().getTrainId(), departureStationId)
+//                .orElseThrow(() -> new IllegalArgumentException("Departure station not found in train schedule"));
+//        TrainSchedule arrivalSchedule = trainScheduleRepository.findByTrainIdAndStationId(carriage.getTrip().getTrain().getTrainId(), arrivalStationId)
+//                .orElseThrow(() -> new IllegalArgumentException("Arrival station not found in train schedule"));
+//
+//        int requestDepartureOrdinal = departureSchedule.getOrdinalNumber();
+//        int requestArrivalOrdinal = arrivalSchedule.getOrdinalNumber();
+//
+//        if (requestDepartureOrdinal >= requestArrivalOrdinal) {
+//            throw new IllegalArgumentException("Departure station must be before arrival station");
+//        }
+//
+//        // Chuyển đổi danh sách ghế sang DTO với trạng thái khả dụng
+//        List<SeatAvailabilityResponseDTO> seatDTOs = seats.stream()
+//                .map(seat -> {
+//                    // Kiểm tra xem ghế có bị chiếm bởi vé nào không
+//                    boolean isAvailable = reservations.stream()
+//                            .filter(res -> res.getSeat().getSeatId() == seat.getSeatId())
+//                            .noneMatch(res -> {
+//                                // Lấy ordinalNumber của ga đi và ga đến trong vé
+//                                TrainSchedule resDepartureSchedule = trainScheduleRepository
+//                                        .findByTrainIdAndStationId(carriage.getTrip().getTrain().getTrainId(), res.getDepartureStation().getStationId())
+//                                        .orElseThrow(() -> new IllegalStateException("Invalid reservation data"));
+//                                TrainSchedule resArrivalSchedule = trainScheduleRepository
+//                                        .findByTrainIdAndStationId(carriage.getTrip().getTrain().getTrainId(), res.getArrivalStation().getStationId())
+//                                        .orElseThrow(() -> new IllegalStateException("Invalid reservation data"));
+//
+//                                int resDepartureOrdinal = resDepartureSchedule.getOrdinalNumber();
+//                                int resArrivalOrdinal = resArrivalSchedule.getOrdinalNumber();
+//
+//                                // Ghế không khả dụng nếu hành trình yêu cầu chồng lấn với vé
+//                                return resDepartureOrdinal < requestArrivalOrdinal && resArrivalOrdinal > requestDepartureOrdinal;
+//                            });
+//
+//                    return new SeatAvailabilityResponseDTO(
+//                            seat.getSeatId(),
+//                            seat.getSeatNumber(),
+//                            seat.getFloor(),
+//                            seat.getSeatFactor(),
+//                            seat.getSeatStatus(),
+//                            isAvailable
+//                    );
+//                })
+//                .collect(Collectors.toList());
+//
+//        // Tạo DTO cho toa
+//        return new CarriageSeatAvailabilityResponseDTO(
+//                carriage.getCarriageListId(),
+//                carriage.getStt(),
+//                carriage.getCompartment().getCompartmentName(),
+//                carriage.getCompartment().getClassFactor(),
+//                carriage.getCompartment().getSeatCount(),
+//                seatDTOs
+//        );
+//    }
 
     @Override
     @Transactional(readOnly = true)
@@ -244,12 +316,15 @@ public class CarriageListService implements ICarriageListService {
                                             return resDepartureOrdinal < requestArrivalOrdinal && resArrivalOrdinal > requestDepartureOrdinal;
                                         });
 
+                                // Xác định trạng thái ghế trong phản hồi dựa trên isAvailable
+                                String status = isAvailable ? "AVAILABLE" : "BOOKED";
+
                                 return new SeatAvailabilityResponseDTO(
                                         seat.getSeatId(),
                                         seat.getSeatNumber(),
                                         seat.getFloor(),
                                         seat.getSeatFactor(),
-                                        seat.getSeatStatus(),
+                                        status, // Sử dụng trạng thái tính toán thay vì seat.getSeatStatus()
                                         isAvailable
                                 );
                             })
@@ -270,4 +345,82 @@ public class CarriageListService implements ICarriageListService {
         // Tạo DTO cho chuyến tàu
         return new TripAvailabilityResponseDTO(tripId, carriageDTOs);
     }
+//    @Transactional(readOnly = true)
+//    public TripAvailabilityResponseDTO findTripWithCarriagesAndSeatsAvailability(
+//            int tripId, int departureStationId, int arrivalStationId) {
+//        // Lấy danh sách toa của chuyến tàu
+//        List<CarriageList> carriages = carriageListRepository.findByTripId(tripId);
+//        if (carriages.isEmpty()) {
+//            throw new IllegalArgumentException("No carriages found for tripId: " + tripId);
+//        }
+//
+//        // Lấy danh sách vé của chuyến tàu
+//        List<TicketReservation> reservations = ticketReservationRepository.findByTripId(tripId);
+//
+//        // Lấy ordinalNumber của ga đi và ga đến trong yêu cầu
+//        int trainId = carriages.get(0).getTrip().getTrain().getTrainId();
+//        TrainSchedule departureSchedule = trainScheduleRepository.findByTrainIdAndStationId(trainId, departureStationId)
+//                .orElseThrow(() -> new IllegalArgumentException("Departure station not found in train schedule"));
+//        TrainSchedule arrivalSchedule = trainScheduleRepository.findByTrainIdAndStationId(trainId, arrivalStationId)
+//                .orElseThrow(() -> new IllegalArgumentException("Arrival station not found in train schedule"));
+//
+//        int requestDepartureOrdinal = departureSchedule.getOrdinalNumber();
+//        int requestArrivalOrdinal = arrivalSchedule.getOrdinalNumber();
+//
+//        if (requestDepartureOrdinal >= requestArrivalOrdinal) {
+//            throw new IllegalArgumentException("Departure station must be before arrival station");
+//        }
+//
+//        // Chuyển đổi danh sách toa và ghế
+//        List<CarriageAvailabilityResponseDTO> carriageDTOs = carriages.stream()
+//                .map(carriage -> {
+//                    // Lấy danh sách ghế của toa
+//                    List<Seat> seats = seatRepository.findByCarriageListId(carriage.getCarriageListId());
+//
+//                    // Chuyển đổi danh sách ghế với trạng thái khả dụng
+//                    List<SeatAvailabilityResponseDTO> seatDTOs = seats.stream()
+//                            .map(seat -> {
+//                                // Kiểm tra xem ghế có bị chiếm bởi vé nào không
+//                                boolean isAvailable = reservations.stream()
+//                                        .filter(res -> res.getSeat().getSeatId() == seat.getSeatId())
+//                                        .noneMatch(res -> {
+//                                            TrainSchedule resDepartureSchedule = trainScheduleRepository
+//                                                    .findByTrainIdAndStationId(trainId, res.getDepartureStation().getStationId())
+//                                                    .orElseThrow(() -> new IllegalStateException("Invalid reservation data"));
+//                                            TrainSchedule resArrivalSchedule = trainScheduleRepository
+//                                                    .findByTrainIdAndStationId(trainId, res.getArrivalStation().getStationId())
+//                                                    .orElseThrow(() -> new IllegalStateException("Invalid reservation data"));
+//
+//                                            int resDepartureOrdinal = resDepartureSchedule.getOrdinalNumber();
+//                                            int resArrivalOrdinal = resArrivalSchedule.getOrdinalNumber();
+//
+//                                            return resDepartureOrdinal < requestArrivalOrdinal && resArrivalOrdinal > requestDepartureOrdinal;
+//                                        });
+//
+//                                return new SeatAvailabilityResponseDTO(
+//                                        seat.getSeatId(),
+//                                        seat.getSeatNumber(),
+//                                        seat.getFloor(),
+//                                        seat.getSeatFactor(),
+//                                        seat.getSeatStatus(),
+//                                        isAvailable
+//                                );
+//                            })
+//                            .collect(Collectors.toList());
+//
+//                    // Tạo DTO cho toa
+//                    return new CarriageAvailabilityResponseDTO(
+//                            carriage.getCarriageListId(),
+//                            carriage.getStt(),
+//                            carriage.getCompartment().getCompartmentName(),
+//                            carriage.getCompartment().getClassFactor(),
+//                            carriage.getCompartment().getSeatCount(),
+//                            seatDTOs
+//                    );
+//                })
+//                .collect(Collectors.toList());
+//
+//        // Tạo DTO cho chuyến tàu
+//        return new TripAvailabilityResponseDTO(tripId, carriageDTOs);
+//    }
 }
