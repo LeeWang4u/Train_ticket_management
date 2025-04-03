@@ -36,4 +36,10 @@ public class StationController {
         List<Station> stations = stationService.findStationsByKeyword(keyword);
         return ResponseEntity.ok(stations);
     }
+
+    @GetMapping("station/all")
+    public ResponseEntity<List<Station>> getAllStation() {
+        List<Station> stations = stationService.getAllStation();
+        return ResponseEntity.ok(stations);
+    }
 }
