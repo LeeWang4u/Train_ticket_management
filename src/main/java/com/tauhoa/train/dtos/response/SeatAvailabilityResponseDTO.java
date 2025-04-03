@@ -1,5 +1,6 @@
 package com.tauhoa.train.dtos.response;
 
+
 import java.math.BigDecimal;
 
 public class SeatAvailabilityResponseDTO {
@@ -8,16 +9,18 @@ public class SeatAvailabilityResponseDTO {
     private int floor;
     private BigDecimal seatFactor;
     private String seatStatus;
-    private boolean available; // Trạng thái có thể mua được
+    private boolean available;
+    private BigDecimal ticketPrice; // Thêm trường giá vé
 
     public SeatAvailabilityResponseDTO(int seatId, String seatNumber, int floor, BigDecimal seatFactor,
-                                       String seatStatus, boolean available) {
+                                       String seatStatus, boolean available, BigDecimal ticketPrice) {
         this.seatId = seatId;
         this.seatNumber = seatNumber;
         this.floor = floor;
         this.seatFactor = seatFactor;
         this.seatStatus = seatStatus;
         this.available = available;
+        this.ticketPrice = ticketPrice;
     }
 
     // Getter và Setter
@@ -67,5 +70,13 @@ public class SeatAvailabilityResponseDTO {
 
     public void setAvailable(boolean available) {
         this.available = available;
+    }
+
+    public BigDecimal getTicketPrice() {
+        return ticketPrice;
+    }
+
+    public void setTicketPrice(BigDecimal ticketPrice) {
+        this.ticketPrice = ticketPrice;
     }
 }
