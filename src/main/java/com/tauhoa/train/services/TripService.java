@@ -119,12 +119,12 @@ public class TripService implements ITripService {
                     int trainId = trip.getTrain().getTrainId();
                     List<TrainSchedule> schedules = trainScheduleRepository.findByTrainId(trainId);
 
+                    // Kiểm tra nếu schedules rỗng, bỏ qua chuyến tàu này
                     if (schedules.isEmpty()) {
                         return null; // Không có lịch trình cho tàu này
                     }
-                    // Tìm lịch trình cho ga đi và ga đến
-                    TrainSchedule firstSchedule = schedules.get(0); // Ga đầu tiên
 
+                    // Tìm lịch trình cho ga đi và ga đến
                     TrainSchedule departureSchedule = schedules.stream()
                             .filter(ts -> ts.getStation().getStationId() == departureStationId)
                             .findFirst()
@@ -140,36 +140,18 @@ public class TripService implements ITripService {
                         return null;
                     }
 
-//                    // Tính thời gian thực tế tại ga đi và ga đến
-//                    LocalDateTime tripStart = trip.getTripDate(); // Thời gian xuất phát từ ga đầu tiên
-//                    LocalTime firstDepartureTime = schedules.get(0).getDepartureTime(); // Giờ xuất phát tại ga đầu tiên
-//                    LocalDateTime firstDepartureDateTime = tripStart.with(firstDepartureTime);
-//
-//                    // Tính thời gian tại ga đi
-//                    LocalTime depTime = departureSchedule.getDepartureTime();
-//                    long hoursFromStartToDep = calculateHoursBetween(firstDepartureTime, depTime);
-//                    LocalDateTime departureDateTime = firstDepartureDateTime.plusHours(hoursFromStartToDep);
-//
-//                    // Tính thời gian tại ga đến
-//                    LocalTime arrTime = arrivalSchedule.getArrivalTime();
-//                    long hoursFromStartToArr = calculateHoursBetween(firstDepartureTime, arrTime);
-//                    LocalDateTime arrivalDateTime = firstDepartureDateTime.plusHours(hoursFromStartToArr);
-
                     // Lấy thời gian xuất phát tại ga đầu tiên từ trip_date
                     LocalDateTime tripStart = trip.getTripDate();
-                    LocalTime firstDepartureTime = firstSchedule.getDepartureTime();
 
                     // Tính thời gian thực tế tại ga đi
+                    int depDayOffset = departureSchedule.getDay() - 1; // Số ngày kể từ ngày đầu tiên
                     LocalTime depTime = departureSchedule.getDepartureTime();
-                    long minutesFromStartToDep = calculateMinutesBetween(firstDepartureTime, depTime,
-                            firstSchedule.getOrdinalNumber(), departureSchedule.getOrdinalNumber());
-                    LocalDateTime departureDateTime = tripStart.plusMinutes(minutesFromStartToDep);
+                    LocalDateTime departureDateTime = tripStart.plusDays(depDayOffset).with(depTime);
 
                     // Tính thời gian thực tế tại ga đến
+                    int arrDayOffset = arrivalSchedule.getDay() - 1; // Số ngày kể từ ngày đầu tiên
                     LocalTime arrTime = arrivalSchedule.getArrivalTime();
-                    long minutesFromStartToArr = calculateMinutesBetween(firstDepartureTime, arrTime,
-                            firstSchedule.getOrdinalNumber(), arrivalSchedule.getOrdinalNumber());
-                    LocalDateTime arrivalDateTime = tripStart.plusMinutes(minutesFromStartToArr);
+                    LocalDateTime arrivalDateTime = tripStart.plusDays(arrDayOffset).with(arrTime);
 
                     // Kiểm tra xem ngày tại ga đi có khớp với ngày tìm kiếm không
                     if (!departureDateTime.toLocalDate().equals(searchDate)) {
@@ -183,65 +165,16 @@ public class TripService implements ITripService {
                             trip.getBasePrice(),
                             trip.getTripDate(),
                             trip.getTripStatus(),
-                            departureStationName, // Tên ga đi
-                            arrivalStationName,   // Tên ga đến
-                            departureDateTime,    // Thời gian xuất phát tại ga đi
-                            arrivalDateTime       // Thời gian đến tại ga đến
+                            departureStationName,
+                            arrivalStationName,
+                            departureDateTime,
+                            arrivalDateTime
                     );
                 })
-                .filter(dto -> dto != null) // Loại bỏ các chuyến tàu không phù hợp
+                .filter(dto -> dto != null)
                 .collect(Collectors.toList());
     }
 
-//    @Override
-//    public List<TripResponseDTO> findTrips(String departureStation, String arrivalStation, LocalDate tripDate) {
-//        // Lấy các chuyến tàu tiềm năng
-//        List<Trip> trips = tripRepository.findTripsByStations(departureStation, arrivalStation);
-//
-//        // Lọc và chuyển đổi sang DTO
-//        return trips.stream()
-//                .map(trip -> {
-//                    // Tìm TrainSchedule của ga đi
-//                    TrainSchedule departureSchedule = trip.getTrain().getTrainSchedules().stream()
-//                            .filter(ts -> ts.getStation().getStationName().equals(departureStation))
-//                            .findFirst()
-//                            .orElse(null);
-//                    if (departureSchedule == null) return null;
-//
-//                    // Tính thời gian thực tế tại ga đi
-//                    LocalDateTime tripStart = trip.getTripDate();
-//                    LocalTime departureTime = departureSchedule.getDepartureTime();
-//                    if (departureTime == null) return null;
-//
-//                    LocalDateTime actualDateTimeAtDeparture = tripStart
-//                            .plusHours(departureTime.getHour())
-//                            .plusMinutes(departureTime.getMinute());
-//
-//                    // Kiểm tra ngày thực tế tại ga đi
-//                    if (!actualDateTimeAtDeparture.toLocalDate().equals(tripDate)) return null;
-//
-//                    // Tìm TrainSchedule của ga đến (để lấy tên ga)
-//                    TrainSchedule arrivalSchedule = trip.getTrain().getTrainSchedules().stream()
-//                            .filter(ts -> ts.getStation().getStationName().equals(arrivalStation))
-//                            .findFirst()
-//                            .orElse(null);
-//                    if (arrivalSchedule == null) return null;
-//
-//                    // Tạo DTO
-//                    return new TripResponseDTO(
-//                            trip.getTripId(),
-//                            trip.getTrain().getTrainName(),
-//                            trip.getBasePrice(),
-//                            trip.getTripDate(),
-//                            trip.getTripStatus(),
-//                            departureStation,
-//                            arrivalStation,
-//                            actualDateTimeAtDeparture
-//                    );
-//                })
-//                .filter(dto -> dto != null) // Loại bỏ các DTO null
-//                .collect(Collectors.toList());
-//    }
     private long calculateHoursBetween(LocalTime startTime, LocalTime endTime) {
         long hours = java.time.Duration.between(startTime, endTime).toHours();
         if (hours < 0) {
