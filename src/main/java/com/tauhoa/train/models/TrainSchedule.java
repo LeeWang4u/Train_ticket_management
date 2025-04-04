@@ -42,12 +42,18 @@ public class TrainSchedule {
     @Column(name = "distance", nullable = false)
     private BigDecimal distance;
 
-    public TrainSchedule(Station station, Train train, LocalTime arrivalTime, LocalTime departureTime, Integer ordinalNumber, BigDecimal distance) {
+    @Column(name = "day", nullable = false, columnDefinition = "INT DEFAULT 1")
+    private int day; // Trường mới
+
+    public TrainSchedule(Station station, Train train, LocalTime arrivalTime,
+                         LocalTime departureTime, Integer ordinalNumber, BigDecimal distance
+                            ,int day) {
         this.station = station;
         this.train = train;
         this.arrivalTime = arrivalTime;
         this.departureTime = departureTime;
         this.ordinalNumber = ordinalNumber;
         this.distance = distance;
+        this.day = day;
     }
 }
