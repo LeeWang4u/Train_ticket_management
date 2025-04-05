@@ -21,6 +21,7 @@ public class CarriageListService implements ICarriageListService {
     private final TicketReservationRepository ticketReservationRepository;
     private final TrainScheduleRepository trainScheduleRepository;
     private final TripRepository tripRepository;
+    private final StationRepository stationRepository;
 
 
     @Override
@@ -309,4 +310,115 @@ public class CarriageListService implements ICarriageListService {
         return new TripAvailabilityResponseDTO(tripId, carriageDTOs);
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public TripAvailabilityResponseDTO findTripWithCarriagesAndSeatsAvailabilityByStationName(
+                int tripId, String departureStationName, String arrivalStationName) {
+        // Lấy thông tin Trip để có base_price
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new IllegalArgumentException("Trip not found for tripId: " + tripId));
+        BigDecimal basePrice = trip.getBasePrice();
+
+        // Lấy station_id từ station_name
+        Station departureStationEntity = stationRepository.findByStationName(departureStationName)
+                .orElseThrow(() -> new IllegalArgumentException("Departure station not found: " + departureStationName));
+        Station arrivalStationEntity = stationRepository.findByStationName(arrivalStationName)
+                .orElseThrow(() -> new IllegalArgumentException("Arrival station not found: " + arrivalStationName));
+
+        int departureStationId = departureStationEntity.getStationId();
+        int arrivalStationId = arrivalStationEntity.getStationId();
+
+        // Lấy danh sách toa của chuyến tàu
+        List<CarriageList> carriages = carriageListRepository.findByTripId(tripId);
+        if (carriages.isEmpty()) {
+            throw new IllegalArgumentException("No carriages found for tripId: " + tripId);
+        }
+
+        // Lấy danh sách vé của chuyến tàu
+        List<TicketReservation> reservations = ticketReservationRepository.findByTripId(tripId);
+
+        // Lấy ordinalNumber và distance của ga đi và ga đến trong yêu cầu
+        int trainId = carriages.get(0).getTrip().getTrain().getTrainId();
+        TrainSchedule departureSchedule = trainScheduleRepository.findByTrainIdAndStationId(trainId, departureStationId)
+                .orElseThrow(() -> new IllegalArgumentException("Departure station not found in train schedule"));
+        TrainSchedule arrivalSchedule = trainScheduleRepository.findByTrainIdAndStationId(trainId, arrivalStationId)
+                .orElseThrow(() -> new IllegalArgumentException("Arrival station not found in train schedule"));
+
+        int requestDepartureOrdinal = departureSchedule.getOrdinalNumber();
+        int requestArrivalOrdinal = arrivalSchedule.getOrdinalNumber();
+        BigDecimal distance = arrivalSchedule.getDistance().subtract(departureSchedule.getDistance()); // Tính khoảng cách
+
+        if (requestDepartureOrdinal >= requestArrivalOrdinal) {
+            throw new IllegalArgumentException("Departure station must be before arrival station");
+        }
+
+        if (distance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Invalid distance calculation: distance cannot be negative");
+        }
+
+        // Chuyển đổi danh sách toa và ghế
+        List<CarriageAvailabilityResponseDTO> carriageDTOs = carriages.stream()
+                .map(carriage -> {
+                    // Lấy danh sách ghế của toa
+                    List<Seat> seats = seatRepository.findByCarriageListId(carriage.getCarriageListId());
+
+                    // Chuyển đổi danh sách ghế với trạng thái khả dụng và giá vé
+                    List<SeatAvailabilityResponseDTO> seatDTOs = seats.stream()
+                            .map(seat -> {
+                                // Kiểm tra xem ghế có bị chiếm bởi vé nào không
+                                boolean isAvailable = reservations.stream()
+                                        .filter(res -> res.getSeat().getSeatId() == seat.getSeatId())
+                                        .noneMatch(res -> {
+                                            TrainSchedule resDepartureSchedule = trainScheduleRepository
+                                                    .findByTrainIdAndStationId(trainId, res.getDepartureStation().getStationId())
+                                                    .orElseThrow(() -> new IllegalStateException("Invalid reservation data"));
+                                            TrainSchedule resArrivalSchedule = trainScheduleRepository
+                                                    .findByTrainIdAndStationId(trainId, res.getArrivalStation().getStationId())
+                                                    .orElseThrow(() -> new IllegalStateException("Invalid reservation data"));
+
+                                            int resDepartureOrdinal = resDepartureSchedule.getOrdinalNumber();
+                                            int resArrivalOrdinal = resArrivalSchedule.getOrdinalNumber();
+
+                                            return resDepartureOrdinal < requestArrivalOrdinal && resArrivalOrdinal > requestDepartureOrdinal;
+                                        });
+
+                                // Xác định trạng thái ghế
+                                String status = isAvailable ? "AVAILABLE" : "BOOKED";
+
+                                // Tính giá vé: base_price * distance * class_factor * seat_factor
+                                BigDecimal classFactor = carriage.getCompartment().getClassFactor();
+                                BigDecimal seatFactor = seat.getSeatFactor();
+                                BigDecimal ticketPrice = basePrice
+                                        .multiply(distance)
+                                        .multiply(classFactor)
+                                        .multiply(seatFactor);
+
+                                return new SeatAvailabilityResponseDTO(
+                                        seat.getSeatId(),
+                                        seat.getSeatNumber(),
+                                        seat.getFloor(),
+                                        seat.getSeatFactor(),
+                                        status,
+                                        isAvailable,
+                                        ticketPrice // Thêm giá vé
+                                );
+                            })
+                            .collect(Collectors.toList());
+
+                    // Tạo DTO cho toa
+                    return new CarriageAvailabilityResponseDTO(
+                            carriage.getCarriageListId(),
+                            carriage.getStt(),
+                            carriage.getCompartment().getCompartmentName(),
+                            carriage.getCompartment().getClassFactor(),
+                            carriage.getCompartment().getSeatCount(),
+                            seatDTOs
+                    );
+                })
+                .collect(Collectors.toList());
+
+        // Tạo DTO cho chuyến tàu
+        return new TripAvailabilityResponseDTO(tripId, carriageDTOs);
+    }
 }

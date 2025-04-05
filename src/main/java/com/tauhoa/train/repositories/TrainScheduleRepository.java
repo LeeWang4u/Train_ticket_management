@@ -16,4 +16,7 @@ public interface TrainScheduleRepository extends JpaRepository<TrainSchedule, In
 
     @Query("SELECT ts FROM TrainSchedule ts WHERE ts.train.trainId = :trainId AND ts.station.stationId = :stationId")
     Optional<TrainSchedule> findByTrainIdAndStationId(@Param("trainId") int trainId, @Param("stationId") int stationId);
+
+    @Query("SELECT ts FROM TrainSchedule ts WHERE ts.train.trainId = :trainId ORDER BY ts.ordinalNumber")
+    List<TrainSchedule> findByTrainId(@Param("trainId") int trainId);
 }

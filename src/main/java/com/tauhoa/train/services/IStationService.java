@@ -11,4 +11,5 @@ public interface IStationService {
 
     List<Station> findStationsByKeyword(String keyword);
 
+    List<Station> getAllStation();
 }
