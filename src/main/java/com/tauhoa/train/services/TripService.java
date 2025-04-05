@@ -158,6 +158,7 @@ public class TripService implements ITripService {
                         return null;
                     }
 
+                    int availableSeats = getNumberEmptySeats(trip.getTripId(), departureStationName, arrivalStationName);
                     // Tạo DTO phản hồi
                     return new TripResponseDTO(
                             trip.getTripId(),
@@ -168,7 +169,8 @@ public class TripService implements ITripService {
                             departureStationName,
                             arrivalStationName,
                             departureDateTime,
-                            arrivalDateTime
+                            arrivalDateTime,
+                            availableSeats
                     );
                 })
                 .filter(dto -> dto != null)
@@ -195,6 +197,79 @@ public class TripService implements ITripService {
             minutes += (ordinalDiff - 1) * 24 * 60; // Thêm số ngày giữa các ga (trừ 1 vì ngày đầu đã tính)
         }
         return minutes;
+    }
+
+    public int getNumberEmptySeats(int tripId, String departureStationName, String arrivalStationName ){
+
+        // Lấy thông tin chuyến tàu
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new IllegalArgumentException("Trip not found for tripId: " + tripId));
+
+        // Lấy station_id từ station_name
+        Station departureStation = stationRepository.findByStationName(departureStationName)
+                .orElseThrow(() -> new IllegalArgumentException("Departure station not found: " + departureStationName));
+        Station arrivalStation = stationRepository.findByStationName(arrivalStationName)
+                .orElseThrow(() -> new IllegalArgumentException("Arrival station not found: " + arrivalStationName));
+
+        int departureStationId = departureStation.getStationId();
+        int arrivalStationId = arrivalStation.getStationId();
+
+        // Lấy train_id từ trip
+        int trainId = trip.getTrain().getTrainId();
+
+        // Lấy ordinal_number của ga đi và ga đến
+        TrainSchedule departureSchedule = trainScheduleRepository.findByTrainIdAndStationId(trainId, departureStationId)
+                .orElseThrow(() -> new IllegalArgumentException("Departure station not found in train schedule for trainId: " + trainId));
+        TrainSchedule arrivalSchedule = trainScheduleRepository.findByTrainIdAndStationId(trainId, arrivalStationId)
+                .orElseThrow(() -> new IllegalArgumentException("Arrival station not found in train schedule for trainId: " + trainId));
+
+        int departureOrdinal = departureSchedule.getOrdinalNumber();
+        int arrivalOrdinal = arrivalSchedule.getOrdinalNumber();
+
+        // Kiểm tra thứ tự ga
+        if (departureOrdinal >= arrivalOrdinal) {
+            throw new IllegalArgumentException("Departure station must be before arrival station");
+        }
+
+        // Lấy danh sách toa của chuyến tàu
+        List<CarriageList> carriages = carriageListRepository.findByTripId(tripId);
+        if (carriages.isEmpty()) {
+            throw new IllegalArgumentException("No carriages found for tripId: " + tripId);
+        }
+
+        // Tính tổng số ghế từ tất cả các toa (seat_count trong compartment)
+        int totalSeats = carriages.stream()
+                .mapToInt(carriage -> carriage.getCompartment().getSeatCount())
+                .sum();
+
+        // Lấy danh sách vé đã đặt của chuyến tàu
+        List<TicketReservation> reservations = ticketReservationRepository.findByTripId(tripId);
+
+        // Đếm số ghế đã bị đặt (BOOKED)
+        int bookedSeats = (int) reservations.stream()
+                .filter(reservation -> {
+                    // Lấy ordinal_number của ga đi và ga đến trong vé
+                    TrainSchedule resDepartureSchedule = trainScheduleRepository
+                            .findByTrainIdAndStationId(trainId, reservation.getDepartureStation().getStationId())
+                            .orElseThrow(() -> new IllegalStateException("Invalid reservation data: departure station not found"));
+                    TrainSchedule resArrivalSchedule = trainScheduleRepository
+                            .findByTrainIdAndStationId(trainId, reservation.getArrivalStation().getStationId())
+                            .orElseThrow(() -> new IllegalStateException("Invalid reservation data: arrival station not found"));
+
+                    int resDepartureOrdinal = resDepartureSchedule.getOrdinalNumber();
+                    int resArrivalOrdinal = resArrivalSchedule.getOrdinalNumber();
+
+                    // Ghế bị BOOKED nếu hành trình vé chồng lấn với hành trình yêu cầu
+                    return resDepartureOrdinal < arrivalOrdinal && resArrivalOrdinal > departureOrdinal;
+                })
+                .map(TicketReservation::getSeat) // Lấy ghế từ vé
+                .distinct() // Loại bỏ ghế trùng (một ghế có thể bị đặt nhiều lần trong cùng trip)
+                .count();
+
+        // Số ghế trống = Tổng số ghế - Số ghế đã bị đặt
+        int availableSeats = totalSeats - bookedSeats;
+
+        return availableSeats;
     }
 
 }

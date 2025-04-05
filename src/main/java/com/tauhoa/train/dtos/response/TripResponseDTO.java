@@ -15,9 +15,9 @@ public class TripResponseDTO {
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
 
-    public TripResponseDTO(int tripId, String trainName, BigDecimal basePrice, LocalDateTime tripDate,
-                           String tripStatus, String departureStation, String arrivalStation,
-                           LocalDateTime departureTime, LocalDateTime arrivalTime) {
+    private int availableSeats;
+
+    public TripResponseDTO(int tripId, String trainName, BigDecimal basePrice, LocalDateTime tripDate, String tripStatus, String departureStation, String arrivalStation, LocalDateTime departureTime, LocalDateTime arrivalTime, int availableSeats) {
         this.tripId = tripId;
         this.trainName = trainName;
         this.basePrice = basePrice;
@@ -27,6 +27,15 @@ public class TripResponseDTO {
         this.arrivalStation = arrivalStation;
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
+        this.availableSeats = availableSeats;
+    }
+
+    public int getAvailableSeats() {
+        return availableSeats;
+    }
+
+    public void setAvailableSeats(int availableSeats) {
+        this.availableSeats = availableSeats;
     }
 
     // Getter và Setter
