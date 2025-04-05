@@ -26,4 +26,7 @@ public interface ICarriageListService {
 
     TripAvailabilityResponseDTO findTripWithCarriagesAndSeatsAvailability(
             int tripId, int departureStationId, int arrivalStationId);
+
+    TripAvailabilityResponseDTO findTripWithCarriagesAndSeatsAvailabilityByStationName(
+            int tripId, String departureStation, String arrivalStation);
 }
