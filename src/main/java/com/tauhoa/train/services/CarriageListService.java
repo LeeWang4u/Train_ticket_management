@@ -314,7 +314,7 @@ public class CarriageListService implements ICarriageListService {
     @Override
     @Transactional(readOnly = true)
     public TripAvailabilityResponseDTO findTripWithCarriagesAndSeatsAvailabilityByStationName(
-            int tripId, String departureStationName, String arrivalStationName) {
+                int tripId, String departureStationName, String arrivalStationName) {
         // Lấy thông tin Trip để có base_price
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new IllegalArgumentException("Trip not found for tripId: " + tripId));
