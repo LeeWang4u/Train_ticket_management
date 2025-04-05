@@ -11,4 +11,7 @@ public interface TicketReservationRepository extends JpaRepository<TicketReserva
     TicketReservation findByReservationId(int ticketReservationId);
 
     List<TicketReservation> findBySeatSeatId(int seatId);
+
+    @Query("SELECT tr FROM TicketReservation tr WHERE tr.trip.tripId = :tripId")
+    List<TicketReservation> findByTripId(@Param("tripId") int tripId);
 }
