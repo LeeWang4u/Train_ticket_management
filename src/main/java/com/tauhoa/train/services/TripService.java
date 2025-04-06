@@ -199,7 +199,7 @@ public class TripService implements ITripService {
         return minutes;
     }
 
-    public int getNumberEmptySeats(int tripId, String departureStationName, String arrivalStationName ){
+    public int getNumberEmptySeats(int tripId, String departureStationName, String arrivalStationName) {
 
         // Lấy thông tin chuyến tàu
         Trip trip = tripRepository.findById(tripId)
@@ -271,5 +271,8 @@ public class TripService implements ITripService {
 
         return availableSeats;
     }
-
+    @Override
+    public Trip findByTripId(int tripId) {
+        return tripRepository.findByTripId(tripId);
+    }
 }

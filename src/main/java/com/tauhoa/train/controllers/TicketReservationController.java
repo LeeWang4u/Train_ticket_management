@@ -1,6 +1,7 @@
 package com.tauhoa.train.controllers;
 
 import com.tauhoa.train.dtos.TicketReservationDTO;
+import com.tauhoa.train.dtos.request.TicketReservationReqDTO;
 import com.tauhoa.train.models.TicketReservation;
 import com.tauhoa.train.services.TicketReservationService;
 import jakarta.validation.Valid;
@@ -25,16 +26,16 @@ public class TicketReservationController {
     }
 
     @PostMapping("/reserve")
-    public ResponseEntity<?> reserveTicket(@RequestBody @Valid TicketReservationDTO ticketReservationDTO){
+    public ResponseEntity<?> reserveTicket(@RequestBody @Valid TicketReservationReqDTO ticketReservationDTO){
         TicketReservation ticketReservation = ticketReservationService.save(ticketReservationDTO);
         return ResponseEntity.status(200).body(ticketReservation);
     }
-    @GetMapping("/deleteReserve")
-    public ResponseEntity<?> deleteTicketReservation(@RequestParam int id){
+    @PostMapping("/deleteReserve")
+    public ResponseEntity<?> deleteTicketReservation(@RequestBody @Valid TicketReservationReqDTO ticketReservationDTO){
         try {
-            TicketReservation ticketReservation = ticketReservationService.getTicketReservation(id);
-            ticketReservationService.delete(ticketReservation);
-            return ResponseEntity.status(200).body("Huỷ giữ chỗ thành công");
+
+            ticketReservationService.delete(ticketReservationDTO);
+            return ResponseEntity.status(200).body("Complete");
         } catch (Exception e){
             return ResponseEntity.status(500).body(e.getMessage());
         }
