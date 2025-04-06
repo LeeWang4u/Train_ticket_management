@@ -42,7 +42,4 @@ public class StationService implements IStationService {
 //        return stationRepository.findByStationId(id);
 //    }
 
-    public Optional<Station> findByStationName(String stationName) {
-        return stationRepository.findByStationName(stationName);
-    }
 }
