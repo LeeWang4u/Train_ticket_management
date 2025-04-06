@@ -1,5 +1,6 @@
 package com.tauhoa.train.services;
 
+import com.tauhoa.train.dtos.request.AddTripRequestDTO;
 import com.tauhoa.train.dtos.request.TrainInfoDTO;
 import com.tauhoa.train.dtos.request.TripSearchRequestDTO;
 import com.tauhoa.train.dtos.response.TripResponseDTO;
@@ -16,8 +17,6 @@ public interface ITripService {
     List<TrainInfoDTO> getTrainInfoByStationAndDate(String stationName, LocalDate date);
 
 //    List<TripResponseDTO> findTrips(String departureStation, String arrivalStation, LocalDate tripDate);
-
+Trip addTrip(AddTripRequestDTO request);
     List<TripResponseDTO> findTripsByStationsAndDate(TripSearchRequestDTO request);
-
-    Trip findByTripId(int tripId);
 }

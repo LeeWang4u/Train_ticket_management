@@ -1,6 +1,5 @@
 package com.tauhoa.train.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,9 +26,8 @@ public class Train {
     @JoinColumn(name = "route_id", nullable = false)
     private Route route;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "train", fetch = FetchType.LAZY)
-    private List<TrainSchedule> trainSchedules;
+    private List<TrainSchedule> trainSchedules = new ArrayList<>();
 
     public Train(String trainName, Route route) {
         this.trainName = trainName;

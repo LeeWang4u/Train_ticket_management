@@ -2,13 +2,14 @@ package com.tauhoa.train.dtos.response;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class TripResponseDTO {
     private int tripId;
     private String trainName;
     private BigDecimal basePrice;
-    private LocalDateTime tripDate;
+    private LocalDate tripDate;
     private String tripStatus;
     private String departureStation;
     private String arrivalStation;
@@ -17,7 +18,8 @@ public class TripResponseDTO {
 
     private int availableSeats;
 
-    public TripResponseDTO(int tripId, String trainName, BigDecimal basePrice, LocalDateTime tripDate, String tripStatus, String departureStation, String arrivalStation, LocalDateTime departureTime, LocalDateTime arrivalTime, int availableSeats) {
+    public TripResponseDTO(int tripId, String trainName, BigDecimal basePrice,
+                           LocalDate tripDate, String tripStatus, String departureStation, String arrivalStation, LocalDateTime departureTime, LocalDateTime arrivalTime, int availableSeats) {
         this.tripId = tripId;
         this.trainName = trainName;
         this.basePrice = basePrice;
@@ -63,11 +65,11 @@ public class TripResponseDTO {
         this.basePrice = basePrice;
     }
 
-    public LocalDateTime getTripDate() {
+    public LocalDate getTripDate() {
         return tripDate;
     }
 
-    public void setTripDate(LocalDateTime tripDate) {
+    public void setTripDate(LocalDate tripDate) {
         this.tripDate = tripDate;
     }
 
