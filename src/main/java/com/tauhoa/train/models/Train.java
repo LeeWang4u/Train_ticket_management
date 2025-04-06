@@ -26,8 +26,8 @@ public class Train {
     @JoinColumn(name = "route_id", nullable = false)
     private Route route;
 
-    @OneToMany(mappedBy = "train", fetch = FetchType.LAZY)
-    private List<TrainSchedule> trainSchedules = new ArrayList<>();
+//    @OneToMany(mappedBy = "train", fetch = FetchType.LAZY)
+//    private List<TrainSchedule> trainSchedules = new ArrayList<>();
 
     public Train(String trainName, Route route) {
         this.trainName = trainName;
