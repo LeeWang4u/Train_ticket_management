@@ -141,18 +141,27 @@ public class TripService implements ITripService {
                     }
 
                     // Lấy thời gian xuất phát tại ga đầu tiên từ trip_date
-                    LocalDateTime tripStart = trip.getTripDate();
+                    LocalDate tripStart = trip.getTripDate();
 
                     // Tính thời gian thực tế tại ga đi
-                    int depDayOffset = departureSchedule.getDay() - 1; // Số ngày kể từ ngày đầu tiên
+//                    int depDayOffset = departureSchedule.getDay() - 1; // Số ngày kể từ ngày đầu tiên
+//                    LocalTime depTime = departureSchedule.getDepartureTime();
+//                    LocalDateTime departureDateTime = tripStart.plusDays(depDayOffset).with(depTime);
+//
+//                    // Tính thời gian thực tế tại ga đến
+//                    int arrDayOffset = arrivalSchedule.getDay() - 1; // Số ngày kể từ ngày đầu tiên
+//                    LocalTime arrTime = arrivalSchedule.getArrivalTime();
+//                    LocalDateTime arrivalDateTime = tripStart.plusDays(arrDayOffset).with(arrTime);
+                    int depDayOffset = departureSchedule.getDay() - 1;
+                    LocalDate depDate = tripStart.plusDays(depDayOffset);
                     LocalTime depTime = departureSchedule.getDepartureTime();
-                    LocalDateTime departureDateTime = tripStart.plusDays(depDayOffset).with(depTime);
+                    LocalDateTime departureDateTime = depDate.atTime(depTime);
 
-                    // Tính thời gian thực tế tại ga đến
-                    int arrDayOffset = arrivalSchedule.getDay() - 1; // Số ngày kể từ ngày đầu tiên
+                    // Tính thời gian tại ga đến
+                    int arrDayOffset = arrivalSchedule.getDay() - 1;
+                    LocalDate arrDate = tripStart.plusDays(arrDayOffset);
                     LocalTime arrTime = arrivalSchedule.getArrivalTime();
-                    LocalDateTime arrivalDateTime = tripStart.plusDays(arrDayOffset).with(arrTime);
-
+                    LocalDateTime arrivalDateTime = arrDate.atTime(arrTime);
                     // Kiểm tra xem ngày tại ga đi có khớp với ngày tìm kiếm không
                     if (!departureDateTime.toLocalDate().equals(searchDate)) {
                         return null;
