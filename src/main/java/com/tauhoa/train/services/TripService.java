@@ -1,5 +1,6 @@
 package com.tauhoa.train.services;
 
+import com.tauhoa.train.dtos.request.AddTripRequestDTO;
 import com.tauhoa.train.dtos.request.TrainInfoDTO;
 import com.tauhoa.train.dtos.request.TripSearchRequestDTO;
 import com.tauhoa.train.dtos.response.TripResponseDTO;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,6 +27,8 @@ public class TripService implements ITripService {
     private final SeatRepository seatRepository;
     private final TicketReservationRepository ticketReservationRepository;
     private final CarriageListRepository carriageListRepository;
+    private final TrainRepository trainRepository;
+    private final CompartmentRepository compartmentRepository;
 
     @Override
     public Optional<Trip> getTrip(int id) {
@@ -279,6 +283,148 @@ public class TripService implements ITripService {
         int availableSeats = totalSeats - bookedSeats;
 
         return availableSeats;
+    }
+
+    @Override
+    @Transactional
+    public Trip addTrip(AddTripRequestDTO request) {
+        // Kiểm tra đầu vào
+        if (request.getNumSoftSeatCarriages() < 0 || request.getNumSixBerthCarriages() < 0 || request.getNumFourBerthCarriages() < 0) {
+            throw new IllegalArgumentException("Number of carriages cannot be negative");
+        }
+
+        // Kiểm tra trainId
+        Train train = trainRepository.findById(request.getTrainId())
+                .orElseThrow(() -> new IllegalArgumentException("Train not found for trainId: " + request.getTrainId()));
+
+//        // Kiểm tra xem tàu đã có chuyến trong ngày này chưa
+//        LocalDate tripDate = request.getTripDate();
+//        List<Trip> existingTrips = tripRepository.findByTrainAndTripDate(train, tripDate);
+//        if (!existingTrips.isEmpty()) {
+//            throw new IllegalArgumentException("Tàu " + train.getTrainName() +" này đã được tạo trong ngày: " + tripDate);
+//        }
+
+        // Kiểm tra xem tàu đã có chuyến trong ngày này chưa
+        LocalDate tripDate = request.getTripDate();
+        List<Trip> existingTrips = tripRepository.findByTrainAndTripDate(train, tripDate);
+        if (!existingTrips.isEmpty()) {
+            // Trả về chuyến tàu đã tồn tại
+            return existingTrips.get(0); // Lấy chuyến đầu tiên (vì chỉ có 1 chuyến trong ngày)
+        }
+
+        LocalDate tripDateTime = request.getTripDate();
+
+        // Tạo Trip
+        Trip trip = new Trip();
+        trip.setTrain(train);
+        trip.setBasePrice(request.getBasePrice());
+        trip.setTripDate(tripDateTime);
+        trip.setTripStatus("Scheduled");
+        trip = tripRepository.save(trip);
+
+        // Lấy compartment cho từng loại toa
+        Compartment softSeatCompartment = compartmentRepository.findById(1) // Giả định compartment_id=1 là toa ngồi mềm
+                .orElseThrow(() -> new IllegalArgumentException("Soft seat compartment not found"));
+        Compartment sixBerthCompartment = compartmentRepository.findById(2) // Giả định compartment_id=2 là toa nằm 6
+                .orElseThrow(() -> new IllegalArgumentException("Six-berth compartment not found"));
+        Compartment fourBerthCompartment = compartmentRepository.findById(3) // Giả định compartment_id=3 là toa nằm 4
+                .orElseThrow(() -> new IllegalArgumentException("Four-berth compartment not found"));
+
+        // Tạo danh sách toa (CarriageList)
+        List<CarriageList> carriages = new ArrayList<>();
+        int stt = 1;
+
+        // Toa ngồi mềm
+        for (int i = 0; i < request.getNumSoftSeatCarriages(); i++) {
+            CarriageList carriage = new CarriageList();
+            carriage.setTrip(trip);
+            carriage.setCompartment(softSeatCompartment);
+            carriage.setStt(stt++);
+            carriages.add(carriage);
+        }
+
+        // Toa nằm 6
+        for (int i = 0; i < request.getNumSixBerthCarriages(); i++) {
+            CarriageList carriage = new CarriageList();
+            carriage.setTrip(trip);
+            carriage.setCompartment(sixBerthCompartment);
+            carriage.setStt(stt++);
+            carriages.add(carriage);
+        }
+
+        // Toa nằm 4
+        for (int i = 0; i < request.getNumFourBerthCarriages(); i++) {
+            CarriageList carriage = new CarriageList();
+            carriage.setTrip(trip);
+            carriage.setCompartment(fourBerthCompartment);
+            carriage.setStt(stt++);
+            carriages.add(carriage);
+        }
+
+        // Lưu danh sách toa
+        carriageListRepository.saveAll(carriages);
+
+        // Tạo ghế cho từng toa
+        for (CarriageList carriage : carriages) {
+            Compartment compartment = carriage.getCompartment();
+            int seatCount = compartment.getSeatCount();
+            List<Seat> seats = new ArrayList<>();
+
+            if (compartment.getCompartmentId() == 1) { // Toa ngồi mềm
+                for (int row = 1; row <= seatCount / 4; row++) {
+                    for (char seatLetter : new char[]{'A', 'B', 'C', 'D'}) {
+                        Seat seat = new Seat();
+                        seat.setCarriageList(carriage);
+                        seat.setSeatNumber(row + String.valueOf(seatLetter));
+                        seat.setFloor(1);
+                        seat.setSeatFactor(BigDecimal.valueOf(1.0));
+                        seat.setSeatStatus("Available");
+                        seats.add(seat);
+                    }
+                }
+            } else if (compartment.getCompartmentId() == 2) { // Toa nằm 6
+                for (int row = 1; row <= seatCount / 3; row++) {
+                    for (int floor = 1; floor <= 3; floor++) {
+                        Seat seat = new Seat();
+                        seat.setCarriageList(carriage);
+                        seat.setSeatNumber(row + (floor == 1 ? "A" : floor == 2 ? "B" : "C"));
+                        seat.setFloor(floor);
+                        if (floor == 1) {
+                            seat.setSeatFactor(BigDecimal.valueOf(1.0));
+                        } else if (floor == 2) {
+                            seat.setSeatFactor(BigDecimal.valueOf(1.2));
+                        } else {
+                            seat.setSeatFactor(BigDecimal.valueOf(1.4));
+                        }
+                        seat.setSeatStatus("Available");
+                        seats.add(seat);
+                    }
+                }
+            } else if (compartment.getCompartmentId() == 3) { // Toa nằm 4
+                for (int row = 1; row <= seatCount / 2; row++) {
+                    for (int floor = 1; floor <= 2; floor++) {
+                        Seat seat = new Seat();
+                        seat.setCarriageList(carriage);
+                        seat.setSeatNumber(row + (floor == 1 ? "A" : "B"));
+                        seat.setFloor(floor);
+                        if (floor == 1) {
+                            seat.setSeatFactor(BigDecimal.valueOf(1.0));
+                        } else {
+                            seat.setSeatFactor(BigDecimal.valueOf(1.2));
+                        }
+                        seat.setSeatStatus("Available");
+                        seats.add(seat);
+                    }
+                }
+            }
+            seatRepository.saveAll(seats);
+        }
+
+        return trip;
+    }
+
+    public TripRepository getTripRepository() {
+        return tripRepository;
     }
 
 }

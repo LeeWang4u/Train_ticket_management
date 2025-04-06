@@ -1,6 +1,7 @@
 package com.tauhoa.train.repositories;
 
 
+import com.tauhoa.train.models.Train;
 import com.tauhoa.train.models.Trip;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,6 +25,7 @@ public interface TripRepository extends JpaRepository<Trip, Integer> {
     @Query("SELECT t FROM Trip t WHERE t.train.trainId = :trainId AND t.tripDate = :tripDate")
     List<Trip> findByTrainIdAndTripDate(@Param("trainId") int trainId, @Param("tripDate") LocalDate tripDate);
 
+    List<Trip> findByTrainAndTripDate(Train train, LocalDate tripDate);
 //    @Query("SELECT t FROM Trip t " +
 //            "WHERE t.train.trainId IN (" +
 //            "    SELECT ts1.train.trainId " +
