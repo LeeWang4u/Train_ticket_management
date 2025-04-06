@@ -41,5 +41,7 @@ public class StationService implements IStationService {
 //    public List<Station> getStation(int id) {
 //        return stationRepository.findByStationId(id);
 //    }
-
+public Optional<Station> findByStationName(String stationName) {
+    return stationRepository.findByStationName(stationName);
+}
 }
