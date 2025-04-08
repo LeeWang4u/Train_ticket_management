@@ -12,6 +12,12 @@ public class TripSearchRequestDTO {
         return departureStation;
     }
 
+    public TripSearchRequestDTO(String departureStation, String arrivalStation, LocalDate tripDate) {
+        this.departureStation = departureStation;
+        this.arrivalStation = arrivalStation;
+        this.tripDate = tripDate;
+    }
+
     public void setDepartureStation(String departureStation) {
         this.departureStation = departureStation;
     }
