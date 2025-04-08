@@ -27,8 +27,13 @@ public class TicketReservationController {
 
     @PostMapping("/reserve")
     public ResponseEntity<?> reserveTicket(@RequestBody @Valid TicketReservationReqDTO ticketReservationDTO){
-        TicketReservation ticketReservation = ticketReservationService.save(ticketReservationDTO);
-        return ResponseEntity.status(200).body(ticketReservation);
+        try{
+            TicketReservation ticketReservation = ticketReservationService.save(ticketReservationDTO);
+            return ResponseEntity.status(200).body(ticketReservation);
+        } catch (Exception e){
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+
     }
     @PostMapping("/deleteReserve")
     public ResponseEntity<?> deleteTicketReservation(@RequestBody @Valid TicketReservationReqDTO ticketReservationDTO){
