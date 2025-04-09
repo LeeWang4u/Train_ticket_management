@@ -1,6 +1,5 @@
 package com.tauhoa.train.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,6 +29,8 @@ public class Train {
 
     @OneToMany(mappedBy = "train", fetch = FetchType.LAZY)
     @JsonIgnoreProperties("train")
+    @OneToMany(mappedBy = "train", fetch = FetchType.LAZY)
+
     private List<TrainSchedule> trainSchedules;
 
     public Train(String trainName, Route route) {

@@ -29,7 +29,6 @@ public class TripService implements ITripService {
     private final CarriageListRepository carriageListRepository;
     private final TrainRepository trainRepository;
     private final CompartmentRepository compartmentRepository;
-
     @Override
     public Optional<Trip> getTrip(int id) {
         return tripRepository.findById(id);
@@ -283,6 +282,10 @@ public class TripService implements ITripService {
         int availableSeats = totalSeats - bookedSeats;
 
         return availableSeats;
+    }
+
+    public Trip findByTripId(int tripId) {
+        return tripRepository.findByTripId(tripId);
     }
 
     @Override
