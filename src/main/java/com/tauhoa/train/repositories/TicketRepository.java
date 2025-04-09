@@ -10,6 +10,5 @@ import java.util.List;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket,Integer> {
-    Ticket findByTicketId(Integer ticketId);
     List<Ticket> findByCustomer(Customer customer);
 }
