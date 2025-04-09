@@ -9,5 +9,5 @@ public interface ITicketService {
     void save(TicketInformationDTO ticketDTO, Customer customer, Passenger passenger, Invoice invoice);
     void update(String ticketStatus);
     Ticket findByTicketId(Integer ticketId);
-    List<Ticket> findByCustomer(Customer customer);
+    List<Ticket> findByCustomer(String cccd, String phone);
 }
