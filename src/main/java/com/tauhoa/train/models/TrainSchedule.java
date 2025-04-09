@@ -1,5 +1,6 @@
 package com.tauhoa.train.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,7 +28,8 @@ public class TrainSchedule {
     private Station station;
 
     @ManyToOne
-    @JoinColumn(name = "train_id", nullable = false)
+    @JoinColumn(name = "train_id")
+    @JsonIgnoreProperties("trainSchedules")
     private Train train;
 
     @Column(name = "arrival_time")
