@@ -79,7 +79,7 @@ public class TripController {
         try {
             List<TripResponseDTO> trips = tripService.findTripsByStationsAndDate(request);
             if (trips.isEmpty()) {
-                return ResponseEntity.status(200).body("No trips found for the given stations and date");
+                return ResponseEntity.status(500).body("No trips found for the given stations and date");
             }
             return ResponseEntity.ok(trips);
         } catch (IllegalArgumentException e) {
