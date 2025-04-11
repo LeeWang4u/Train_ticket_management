@@ -27,7 +27,6 @@ public class Train {
     @JoinColumn(name = "route_id", nullable = false)
     private Route route;
 
-    @OneToMany(mappedBy = "train", fetch = FetchType.LAZY)
     @JsonIgnoreProperties("train")
     @OneToMany(mappedBy = "train", fetch = FetchType.LAZY)
 
