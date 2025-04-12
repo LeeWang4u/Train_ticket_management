@@ -29,7 +29,7 @@ public class Train {
 
     @OneToMany(mappedBy = "train", fetch = FetchType.LAZY)
     @JsonIgnoreProperties("train")
-    @OneToMany(mappedBy = "train", fetch = FetchType.LAZY)
+//    @OneToMany(mappedBy = "train", fetch = FetchType.LAZY)
 
     private List<TrainSchedule> trainSchedules;
 
