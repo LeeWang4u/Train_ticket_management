@@ -3,15 +3,18 @@ package com.tauhoa.train.controllers;
 import com.tauhoa.train.dtos.PassengerDTO;
 import com.tauhoa.train.dtos.TicketDTO;
 import com.tauhoa.train.dtos.TicketInformationDTO;
+import com.tauhoa.train.dtos.request.TicketSearchRequestDTO;
 import com.tauhoa.train.models.Customer;
 import com.tauhoa.train.models.Invoice;
 import com.tauhoa.train.models.Passenger;
+import com.tauhoa.train.models.Ticket;
 import com.tauhoa.train.services.InvoiceService;
 import com.tauhoa.train.services.PassengerService;
 import com.tauhoa.train.services.TicketService;
 import com.tauhoa.train.services.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,9 +31,9 @@ import java.math.BigDecimal;
 public class TicketController {
     private final TicketService ticketService;
     private final InvoiceService invoiceService;
-    private final CustomerService userService;
     private final PassengerService passengerService;
     private final CustomerService customerService;
+
     @PostMapping("/confirmTicket")
     public ResponseEntity<String> bookTicket(@RequestBody @Valid TicketDTO request) {
         try {
@@ -61,5 +66,38 @@ public class TicketController {
         } catch (Exception e){
                 return ResponseEntity.status(500).body(e.getMessage());
         }
+    }
+
+    @PostMapping("/searchTicket")
+    public ResponseEntity<?> searchTicketById(@RequestBody TicketSearchRequestDTO request) {
+        Integer ticketId = request.getTicketId();
+        if (ticketId == null) {
+            return ResponseEntity.badRequest().body("Vui lòng cung cấp ticketId!");
+        }
+
+        try {
+            Ticket ticket = ticketService.findByTicketId(ticketId);
+            return ResponseEntity.ok(ticket); // Trả trực tiếp entity
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Không tìm thấy vé với ID: " + ticketId);
+        }
+    }
+
+    @PostMapping("/searchCusTicket")
+    public ResponseEntity<?> searchTicketsByCustomer(@RequestBody TicketSearchRequestDTO request) {
+        String cccd = request.getCccd();
+        String phone = request.getPhone();
+
+        if (cccd == null || cccd.isEmpty() || phone == null || phone.isEmpty()) {
+            return ResponseEntity.badRequest().body("Vui lòng nhập đầy đủ cả CCCD và số điện thoại!");
+        }
+
+        List<Ticket> tickets = ticketService.findByCustomer(cccd, phone);
+        if (tickets.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(tickets);
     }
 }

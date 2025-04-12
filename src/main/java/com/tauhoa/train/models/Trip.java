@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -27,12 +28,12 @@ public class Trip {
     private BigDecimal basePrice;
 
     @Column(name = "trip_date", nullable = false)
-    private LocalDateTime tripDate;
+    private LocalDate tripDate;
 
     @Column(name = "trip_status", nullable = false)
     private String tripStatus;
 
-    public Trip(Train train, BigDecimal basePrice, LocalDateTime tripDate, String tripStatus) {
+    public Trip(Train train, BigDecimal basePrice, LocalDate tripDate, String tripStatus) {
         this.train = train;
         this.basePrice = basePrice;
         this.tripDate = tripDate;
