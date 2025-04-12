@@ -28,7 +28,7 @@ public class Train {
     private Route route;
 
     @JsonIgnoreProperties("train")
-    @OneToMany(mappedBy = "train", fetch = FetchType.LAZY)
+//    @OneToMany(mappedBy = "train", fetch = FetchType.LAZY)
 
     private List<TrainSchedule> trainSchedules;
 
