@@ -1,4 +1,4 @@
-package com.fridge.fridgeproject.securities;
+package com.tauhoa.train.securities;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

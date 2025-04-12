@@ -1,6 +1,7 @@
-package com.fridge.fridgeproject.securities;
+package com.tauhoa.train.securities;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -25,17 +26,18 @@ public class JwtTokenProvider {
         this.refreshTokenService = refreshTokenService;
     }
 
-    public String createAccessToken(String userId, String role) {
-        Claims claims = Jwts.claims().setSubject(userId);
-        claims.put("role", role);
+    public String createAccessToken(String email) {
         Date now = new Date();
-        JwtBuilder jwtBuilder = Jwts.builder();
-        jwtBuilder.setClaims(claims);
-        jwtBuilder.setIssuedAt(now);
-        jwtBuilder.setExpiration(new Date(now.getTime() + accessTokenExpiration * 1000L)); // 30초
-        jwtBuilder.signWith(SignatureAlgorithm.HS256, secretKey);
-        return jwtBuilder.compact();
+        Date expiryDate = new Date(now.getTime() + accessTokenExpiration * 1000L);
+
+        return Jwts.builder()
+                .subject(email)
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS256, secretKey.getBytes())
+                .compact();
     }
+
 
     public String createRefreshToken(String userId) {
         Date now = new Date();
@@ -49,7 +51,10 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            Jwts.parser()
+                    .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                    .build()
+                    .parseSignedClaims(token);
             return true;
         } catch (ExpiredJwtException e) {
             return false; //토큰 만료
@@ -60,9 +65,11 @@ public class JwtTokenProvider {
 
     public boolean isTokenExpired(String token) {
         try {
-            Date expiration = Jwts.parser().setSigningKey(secretKey)
-                    .parseClaimsJws(token)
-                    .getBody()
+            Date expiration = Jwts.parser()
+                    .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
                     .getExpiration();
             return expiration.before(new Date());
         } catch (ExpiredJwtException e) {
@@ -73,7 +80,11 @@ public class JwtTokenProvider {
     }
 
     public Claims getClaims(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
 }
