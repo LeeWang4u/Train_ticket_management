@@ -1,5 +1,6 @@
 package com.tauhoa.train.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,7 +28,8 @@ public class TrainSchedule {
     private Station station;
 
     @ManyToOne
-    @JoinColumn(name = "train_id", nullable = false)
+    @JoinColumn(name = "train_id")
+    @JsonIgnoreProperties("trainSchedules")
     private Train train;
 
     @Column(name = "arrival_time")
@@ -42,12 +44,18 @@ public class TrainSchedule {
     @Column(name = "distance", nullable = false)
     private BigDecimal distance;
 
-    public TrainSchedule(Station station, Train train, LocalTime arrivalTime, LocalTime departureTime, Integer ordinalNumber, BigDecimal distance) {
+    @Column(name = "day", nullable = false, columnDefinition = "INT DEFAULT 1")
+    private int day; // Trường mới
+
+    public TrainSchedule(Station station, Train train, LocalTime arrivalTime,
+                         LocalTime departureTime, Integer ordinalNumber, BigDecimal distance
+                            ,int day) {
         this.station = station;
         this.train = train;
         this.arrivalTime = arrivalTime;
         this.departureTime = departureTime;
         this.ordinalNumber = ordinalNumber;
         this.distance = distance;
+        this.day = day;
     }
 }

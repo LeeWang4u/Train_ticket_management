@@ -33,8 +33,15 @@ public class StationService implements IStationService {
         return stationRepository.findByStationNameContainingIgnoreCaseOrLocationContainingIgnoreCase(keyword, keyword);
 
     }
+
+    @Override
+    public List<Station> getAllStation() {
+        return stationRepository.findAll();
+    }
 //    public List<Station> getStation(int id) {
 //        return stationRepository.findByStationId(id);
 //    }
-
+public Optional<Station> findByStationName(String stationName) {
+    return stationRepository.findByStationName(stationName);
+}
 }

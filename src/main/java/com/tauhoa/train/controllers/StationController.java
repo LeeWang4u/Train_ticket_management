@@ -36,4 +36,20 @@ public class StationController {
         List<Station> stations = stationService.findStationsByKeyword(keyword);
         return ResponseEntity.ok(stations);
     }
+
+    @GetMapping("station/all")
+    public ResponseEntity<List<Station>> getAllStation() {
+        List<Station> stations = stationService.getAllStation();
+        return ResponseEntity.ok(stations);
+    }
+
+    @GetMapping("station/name")
+    public ResponseEntity<?> getStationByStationName(@RequestParam String stationName){ //@PathVariable("id") @RequestParam("id")
+        try {
+            Optional<Station> existingStation = stationService.findByStationName(stationName);
+            return ResponseEntity.ok(existingStation);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
