@@ -4,7 +4,9 @@ import com.tauhoa.train.dtos.request.AddTripRequestDTO;
 import com.tauhoa.train.dtos.response.ErrorResponse;
 import com.tauhoa.train.dtos.response.TripResponseDTO;
 import com.tauhoa.train.dtos.request.TripSearchRequestDTO;
+import com.tauhoa.train.models.Train;
 import com.tauhoa.train.models.Trip;
+import com.tauhoa.train.repositories.TrainRepository;
 import com.tauhoa.train.repositories.TripRepository;
 import com.tauhoa.train.services.TripService;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +24,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/trips")
 public class TripController {
-    @Autowired
-    TripService tripService;
+    //@Autowired
+    private final TripService tripService;
+    private final TripRepository tripRepository;
+    private final TrainRepository trainRepository;
 
     @GetMapping("/ketqua")
     public ResponseEntity<?> getTripByDate(@PathVariable
@@ -101,15 +105,18 @@ public class TripController {
     @PostMapping("/add")
     public ResponseEntity<?> addTrip(@RequestBody AddTripRequestDTO request) {
         try {
-            Trip trip = tripService.addTrip(request);
-            // Kiểm tra xem chuyến tàu này đã tồn tại hay mới được tạo
-            List<Trip> existingTrips = tripService.getTripRepository()
-                    .findByTrainAndTripDate(trip.getTrain(), trip.getTripDate());
-            if (existingTrips.size() > 1 || (existingTrips.size() == 1)) {/// && existingTrips.get(0).getTripId() != trip.getTripId())) {
-                // Nếu chuyến tàu đã tồn tại (không phải chuyến vừa tạo)
+            Train train = trainRepository.findById(request.getTrainId())
+                    .orElseThrow(() -> new IllegalArgumentException("Train not found for trainId: " + request.getTrainId()));
+
+            LocalDate tripDate = request.getTripDate();
+            List<Trip> existingTrips = tripRepository.findByTrainAndTripDate(train, tripDate);
+            if (!existingTrips.isEmpty()) {
                 return ResponseEntity.status(409) // Conflict
                         .body(new ErrorResponse("Tàu này đã được tạo trong ngày này: " + request.getTripDate(), existingTrips.get(0)));
+
             }
+            Trip trip = tripService.addTrip(request);
+
             // Nếu là chuyến mới tạo
             return ResponseEntity.ok(trip);
         } catch (IllegalArgumentException e) {
