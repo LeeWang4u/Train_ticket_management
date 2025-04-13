@@ -48,6 +48,7 @@ public class TicketController {
                 passengerDTO.setCccd(res.getCccd());
                 passengerDTO.setFullName(res.getFullName());
                 Passenger passenger = passengerService.save(passengerDTO);
+                ticketService.save(res, customer, passenger);
             }
 
             return ResponseEntity.status(200).body("Đặt vé thành công!");
