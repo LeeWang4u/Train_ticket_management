@@ -146,15 +146,6 @@ public class TripService implements ITripService {
                     // Lấy thời gian xuất phát tại ga đầu tiên từ trip_date
                     LocalDate tripStart = trip.getTripDate();
 
-                    // Tính thời gian thực tế tại ga đi
-//                    int depDayOffset = departureSchedule.getDay() - 1; // Số ngày kể từ ngày đầu tiên
-//                    LocalTime depTime = departureSchedule.getDepartureTime();
-//                    LocalDateTime departureDateTime = tripStart.plusDays(depDayOffset).with(depTime);
-//
-//                    // Tính thời gian thực tế tại ga đến
-//                    int arrDayOffset = arrivalSchedule.getDay() - 1; // Số ngày kể từ ngày đầu tiên
-//                    LocalTime arrTime = arrivalSchedule.getArrivalTime();
-//                    LocalDateTime arrivalDateTime = tripStart.plusDays(arrDayOffset).with(arrTime);
                     int depDayOffset = departureSchedule.getDay() - 1;
                     LocalDate depDate = tripStart.plusDays(depDayOffset);
                     LocalTime depTime = departureSchedule.getDepartureTime();
