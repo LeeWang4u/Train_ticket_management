@@ -8,12 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +22,7 @@ public class TicketService implements ITicketService {
     private final CustomerRepository customerRepository;
 
     @Override
-    public void save(TicketInformationDTO ticketInformationDTO, Customer customer, Passenger passenger, Invoice invoice) {
+    public void save(TicketInformationDTO ticketInformationDTO, Customer customer, Passenger passenger, ReservationCode invoice) {
         LocalDateTime date =LocalDateTime.now();
         Ticket ticket = new Ticket();
         ticket.setCustomer(customer);
