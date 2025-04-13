@@ -1,10 +1,18 @@
 spring:
+  security:
+    user:
+      name: user
+      password: password
+  redis:
+    host: localhost
+    port: 6379
+    password:
   application:
     name: train
   datasource:
     url: jdbc:mysql://localhost:3306/train_ticket_system?useSSL=false&serverTimezone=UTC
     username: root
-    password: ""  # Mật khẩu trống
+    password: ""
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -15,3 +23,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+jwt:
+  expiration: 100
+  refresh-expiration: 86400
+  secretKey: "bXlfc3VwZXJfc2VjdXJlX3NlY3JldF9rZXlfZm9yX3RhdWhvYV8xMjM0NTY3ODkwIQ=="
