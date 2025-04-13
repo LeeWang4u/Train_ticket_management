@@ -6,6 +6,13 @@ public class CarriageSeatAvailabilityRequestDTO {
     private int departureStationId;
     private int arrivalStationId;
 
+    public CarriageSeatAvailabilityRequestDTO(int tripId, int carriageListId, int departureStationId, int arrivalStationId) {
+        this.tripId = tripId;
+        this.carriageListId = carriageListId;
+        this.departureStationId = departureStationId;
+        this.arrivalStationId = arrivalStationId;
+    }
+
     // Getter và Setter
     public int getTripId() {
         return tripId;
