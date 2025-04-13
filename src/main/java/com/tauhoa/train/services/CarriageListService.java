@@ -22,6 +22,7 @@ public class CarriageListService implements ICarriageListService {
     private final TrainScheduleRepository trainScheduleRepository;
     private final TripRepository tripRepository;
     private final StationRepository stationRepository;
+    private final TicketRepository ticketRepository;
 
 
     @Override
@@ -336,7 +337,7 @@ public class CarriageListService implements ICarriageListService {
         }
 
         // Lấy danh sách vé của chuyến tàu
-        List<TicketReservation> reservations = ticketReservationRepository.findByTripId(tripId);
+        List<Ticket> reservations = ticketRepository.findByTripIdAndStatusBookedOrHold(tripId);
 
         // Lấy ordinalNumber và distance của ga đi và ga đến trong yêu cầu
         int trainId = carriages.get(0).getTrip().getTrain().getTrainId();

@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 public class InvoiceService implements IInvoiceService {
     private final InvoiceRepository invoiceRepository;
 
-    @Override
-    public ReservationCode save(BigDecimal basePrice){
-        LocalDateTime date =LocalDateTime.now();
-        String status = "Complete";
-        ReservationCode invoice = new ReservationCode( basePrice, status ,  date);
-        return invoiceRepository.save(invoice);
-    }
+//    @Override
+//    public ReservationCode save(BigDecimal basePrice){
+//        LocalDateTime date =LocalDateTime.now();
+//        String status = "Complete";
+//        ReservationCode invoice = new ReservationCode( basePrice, status ,  date);
+//        return invoiceRepository.save(invoice);
+//    }
 }

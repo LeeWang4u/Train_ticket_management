@@ -22,7 +22,7 @@ public class TicketService implements ITicketService {
     private final CustomerRepository customerRepository;
 
     @Override
-    public void save(TicketInformationDTO ticketInformationDTO, Customer customer, Passenger passenger, ReservationCode invoice) {
+    public void save(TicketInformationDTO ticketInformationDTO, Customer customer, Passenger passenger) {
         LocalDateTime date =LocalDateTime.now();
         Ticket ticket = new Ticket();
         ticket.setCustomer(customer);
@@ -30,7 +30,7 @@ public class TicketService implements ITicketService {
         ticket.setTicketStatus("Complete");
         ticket.setDiscount(ticketInformationDTO.getDiscount());
         ticket.setReservation(ticketInformationDTO.getTicketReservation());
-        ticket.setInvoice(invoice);
+
         ticket.setPrice(ticketInformationDTO.getPrice());
         ticket.setPurchaseTime(date);
         ticket.setTotalPrice(ticketInformationDTO.getTotalPrice());

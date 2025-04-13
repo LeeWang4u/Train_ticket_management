@@ -29,7 +29,7 @@ import java.util.List;
 @RequestMapping("/api/tickets")
 public class TicketController {
     private final TicketService ticketService;
-    private final InvoiceService invoiceService;
+   // private final InvoiceService invoiceService;
     private final PassengerService passengerService;
     private final CustomerService customerService;
 
@@ -41,14 +41,13 @@ public class TicketController {
             for (TicketInformationDTO res : request.getTicketInformationDTO()) {
                 totalPrice = totalPrice.add(res.getTotalPrice());
             }
-            ReservationCode invoice = invoiceService.save(totalPrice);
+            //ReservationCode invoice = invoiceService.save(totalPrice);
             for (TicketInformationDTO res : request.getTicketInformationDTO()) {
                 PassengerDTO passengerDTO = new PassengerDTO();
                 passengerDTO.setTicketType(res.getTicketType());
                 passengerDTO.setCccd(res.getCccd());
                 passengerDTO.setFullName(res.getFullName());
                 Passenger passenger = passengerService.save(passengerDTO);
-                ticketService.save(res, customer, passenger,invoice);
             }
 
             return ResponseEntity.status(200).body("Đặt vé thành công!");
