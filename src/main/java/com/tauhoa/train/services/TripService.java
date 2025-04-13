@@ -299,12 +299,12 @@ public class TripService implements ITripService {
 //        }
 
         // Kiểm tra xem tàu đã có chuyến trong ngày này chưa
-        LocalDate tripDate = request.getTripDate();
-        List<Trip> existingTrips = tripRepository.findByTrainAndTripDate(train, tripDate);
-        if (!existingTrips.isEmpty()) {
-            // Trả về chuyến tàu đã tồn tại
-            return existingTrips.get(0); // Lấy chuyến đầu tiên (vì chỉ có 1 chuyến trong ngày)
-        }
+//        LocalDate tripDate = request.getTripDate();
+//        List<Trip> existingTrips = tripRepository.findByTrainAndTripDate(train, tripDate);
+//        if (!existingTrips.isEmpty()) {
+//            // Trả về chuyến tàu đã tồn tại
+//            return existingTrips.get(0); // Lấy chuyến đầu tiên (vì chỉ có 1 chuyến trong ngày)
+//        }
 
         LocalDate tripDateTime = request.getTripDate();
 
