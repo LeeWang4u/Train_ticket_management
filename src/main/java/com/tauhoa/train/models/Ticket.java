@@ -47,10 +47,26 @@ public class Ticket {
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "invoice_id")
-    private Invoice invoice;
+    @JoinColumn(name = "trip_id", nullable = false)
+    private Trip trip;
 
-    public Ticket(TicketReservation reservation, LocalDateTime purchaseTime, BigDecimal price, BigDecimal discount, BigDecimal totalPrice, String ticketStatus, Passenger passenger, Customer customer, Invoice invoice) {
+    @ManyToOne
+    @JoinColumn(name = "seat_id", nullable = false)
+    private Seat seat;
+
+    @ManyToOne
+    @JoinColumn(name = "departure_station_id", nullable = false)
+    private Station departureStation;
+
+    @ManyToOne
+    @JoinColumn(name = "arrival_station_id", nullable = false)
+    private Station arrivalStation;
+
+    @ManyToOne
+    @JoinColumn(name = "reservation_code_id")
+    private ReservationCode reservationCode;
+
+    public Ticket(TicketReservation reservation, LocalDateTime purchaseTime, BigDecimal price, BigDecimal discount, BigDecimal totalPrice, String ticketStatus, Passenger passenger, Customer customer, ReservationCode reservationCode) {
         this.reservation = reservation;
         this.purchaseTime = purchaseTime;
         this.price = price;
@@ -59,6 +75,6 @@ public class Ticket {
         this.ticketStatus = ticketStatus;
         this.passenger = passenger;
         this.customer = customer;
-        this.invoice = invoice;
+        this.reservationCode = reservationCode;
     }
 }

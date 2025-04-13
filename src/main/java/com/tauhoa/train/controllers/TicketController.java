@@ -5,7 +5,7 @@ import com.tauhoa.train.dtos.TicketDTO;
 import com.tauhoa.train.dtos.TicketInformationDTO;
 import com.tauhoa.train.dtos.request.TicketSearchRequestDTO;
 import com.tauhoa.train.models.Customer;
-import com.tauhoa.train.models.Invoice;
+import com.tauhoa.train.models.ReservationCode;
 import com.tauhoa.train.models.Passenger;
 import com.tauhoa.train.models.Ticket;
 import com.tauhoa.train.services.InvoiceService;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -42,7 +41,7 @@ public class TicketController {
             for (TicketInformationDTO res : request.getTicketInformationDTO()) {
                 totalPrice = totalPrice.add(res.getTotalPrice());
             }
-            Invoice invoice = invoiceService.save(totalPrice);
+            ReservationCode invoice = invoiceService.save(totalPrice);
             for (TicketInformationDTO res : request.getTicketInformationDTO()) {
                 PassengerDTO passengerDTO = new PassengerDTO();
                 passengerDTO.setTicketType(res.getTicketType());

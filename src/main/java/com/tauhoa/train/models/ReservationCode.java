@@ -13,25 +13,22 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Invoice {
+public class ReservationCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "invoice_id")
-    private int invoiceId;
+    @Column(name = "reservation_code_id")
+    private int reservation_code_;
 
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
 
-    @Column(name = "invoice_status", nullable = false)
-    private String invoiceStatus;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
-    public Invoice(BigDecimal totalAmount, String invoiceStatus, LocalDateTime createdAt) {
+    public ReservationCode(BigDecimal totalAmount,  LocalDateTime createdAt) {
         this.totalAmount = totalAmount;
-        this.invoiceStatus = invoiceStatus;
         this.createdAt = createdAt;
     }
 }
