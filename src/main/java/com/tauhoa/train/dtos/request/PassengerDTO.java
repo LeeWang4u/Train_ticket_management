@@ -1,4 +1,4 @@
-package com.tauhoa.train.dtos;
+package com.tauhoa.train.dtos.request;
 
 import com.tauhoa.train.models.TicketType;
 import jakarta.validation.constraints.NotBlank;
@@ -7,8 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
