@@ -1,11 +1,9 @@
-package com.tauhoa.train.dtos;
+package com.tauhoa.train.dtos.request;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotNull;
-
-import lombok.*;
 
 @Data
 @Getter
@@ -13,14 +11,14 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TicketDTO {
+public class ReservationCodeRequestDTO {
     @NotNull(message = "Thông tin người dùng không được để trống")
     private CustomerDTO customerDTO;
-//    @JsonProperty("customer_id")
-//    private int customerId;
 
     @NotNull(message = "Danh sách vé không được để trống")
-    private List<TicketInformationDTO> ticketInformationDTO;
+    private List<TicketRequestDTO> ticketRequestDTO;
+
+
     public CustomerDTO getCustomerDTO() {
         return customerDTO;
     }
@@ -29,12 +27,11 @@ public class TicketDTO {
         this.customerDTO = customerDTO;
     }
 
-    public List<TicketInformationDTO> getTicketInformationDTO() {
-        return ticketInformationDTO;
+    public List<TicketRequestDTO> getTicketInformationDTO() {
+        return ticketRequestDTO;
     }
 
-    public void setTicketInformationDTO(List<TicketInformationDTO> ticketInformationDTO) {
-        this.ticketInformationDTO = ticketInformationDTO;
+    public void setTicketInformationDTO(List<TicketRequestDTO> ticketRequestDTO) {
+        this.ticketRequestDTO = ticketRequestDTO;
     }
-
 }
