@@ -1,8 +1,7 @@
 package com.tauhoa.train.services;
 
-import com.tauhoa.train.dtos.CustomerDTO;
+import com.tauhoa.train.dtos.request.CustomerDTO;
 import com.tauhoa.train.models.Customer;
-import com.tauhoa.train.models.User;
 import com.tauhoa.train.repositories.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
