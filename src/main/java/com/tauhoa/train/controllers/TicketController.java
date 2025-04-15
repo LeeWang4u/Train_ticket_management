@@ -7,21 +7,19 @@ import com.tauhoa.train.dtos.request.TicketReservationReqDTO;
 import com.tauhoa.train.dtos.request.TicketSearchRequestDTO;
 import com.tauhoa.train.dtos.response.TicketResponseDTO;
 import com.tauhoa.train.models.*;
-import com.tauhoa.train.services.PassengerService;
-import com.tauhoa.train.services.ReservationCodeService;
-import com.tauhoa.train.services.TicketService;
-import com.tauhoa.train.services.CustomerService;
+import com.tauhoa.train.repositories.TicketRepository;
+import com.tauhoa.train.repositories.TrainScheduleRepository;
+import com.tauhoa.train.services.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -31,6 +29,10 @@ public class TicketController {
     private final ReservationCodeService reservationCodeService;
     private final PassengerService passengerService;
     private final CustomerService customerService;
+    private final EmailService emailService;
+//    private final TicketRepository ticketRepository;
+//    private final TrainScheduleRepository trainScheduleRepository;
+//    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
     @PostMapping("/confirmTicket")
     public ResponseEntity<String> bookTicket(@RequestBody @Valid ReservationCodeRequestDTO request) {
@@ -50,18 +52,22 @@ public class TicketController {
                 Passenger passenger = passengerService.save(passengerDTO);
                 ticketService.save(res, customer, passenger,reservationCode);
             }
-
+            emailService.sendTicketEmail(customer,reservationCode.getReservationCodeId());
             return ResponseEntity.status(200).body("Đặt vé thành công!");
         }catch (Exception e) {
             return ResponseEntity.status(500).body("Lỗi khi đặt vé: " + e.getMessage() + request);
         }
     }
 
-//    @PostMapping("/testTicket")
-//    public ResponseEntity<String> testTicket(@RequestBody String request) {
+//    @GetMapping("/testTicket")
+//    public ResponseEntity<?> testTicket(@RequestParam int request) {
 //        try{
-//                System.out.println( request+"API được gọi được: " );
-//                return ResponseEntity.status(200).body("Success");
+//            Ticket ticket = ticketRepository.findByTicketId(request);
+//            Optional<TrainSchedule> departureTime = trainScheduleRepository.findByTrainIdAndStationId(ticket.getTrip().getTrain().getTrainId(), ticket.getDepartureStation().getStationId());
+//            Optional<TrainSchedule> arrivalTime = trainScheduleRepository.findByTrainIdAndStationId(ticket.getTrip().getTripId(), ticket.getArrivalStation().getStationId());
+//            String departureTimeString = departureTime.map(TrainSchedule::getDepartureTime).map(time -> time.format(timeFormatter))
+//                    .orElse("N/A");
+//                return ResponseEntity.status(200).body(departureTimeString);
 //        } catch (Exception e){
 //                return ResponseEntity.status(500).body(e.getMessage());
 //        }
