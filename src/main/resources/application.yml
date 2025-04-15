@@ -10,7 +10,7 @@ spring:
   application:
     name: train
   datasource:
-    url: jdbc:mysql://localhost:3306/train_ticket_manegement?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/train_ticket_system?useSSL=false&serverTimezone=UTC
     username: root
     password: ""
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -23,6 +23,18 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: hoang290603@gmail.com
+    password: xjwqbmultpylqigd
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 jwt:
   expiration: 100

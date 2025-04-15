@@ -19,10 +19,6 @@ public class Ticket {
     @Column(name = "ticket_id")
     private int ticketId;
 
-    @ManyToOne
-    @JoinColumn(name = "reservation_id", nullable = false)
-    private TicketReservation reservation;
-
     @Column(name = "purchase_time", nullable = false)
     private LocalDateTime purchaseTime;
 
@@ -66,8 +62,7 @@ public class Ticket {
     @JoinColumn(name = "reservation_code_id")
     private ReservationCode reservationCode;
 
-    public Ticket(TicketReservation reservation, LocalDateTime purchaseTime, BigDecimal price, BigDecimal discount, BigDecimal totalPrice, String ticketStatus, Passenger passenger, Customer customer, ReservationCode reservationCode) {
-        this.reservation = reservation;
+    public Ticket( LocalDateTime purchaseTime, BigDecimal price, BigDecimal discount, BigDecimal totalPrice, String ticketStatus, Passenger passenger, Customer customer, ReservationCode reservationCode) {
         this.purchaseTime = purchaseTime;
         this.price = price;
         this.discount = discount;

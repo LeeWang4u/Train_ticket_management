@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "invoice")
+@Table(name = "reservation_code")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +17,7 @@ public class ReservationCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reservation_code_id")
-    private int reservation_code_;
+    private int reservationCodeId;
 
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
