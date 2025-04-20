@@ -25,10 +25,10 @@ public class TripService implements ITripService {
     private final StationRepository stationRepository;
     private final TrainScheduleRepository trainScheduleRepository;
     private final SeatRepository seatRepository;
-    private final TicketReservationRepository ticketReservationRepository;
     private final CarriageListRepository carriageListRepository;
     private final TrainRepository trainRepository;
     private final CompartmentRepository compartmentRepository;
+    private final TicketRepository ticketRepository;
     @Override
     public Optional<Trip> getTrip(int id) {
         return tripRepository.findById(id);
@@ -74,7 +74,7 @@ public class TripService implements ITripService {
 
                     int bookedSeatsInCompartment = 0;
                     for (Seat seat : seats) {
-                        List<TicketReservation> reservations = ticketReservationRepository.findBySeatSeatId(seat.getSeatId());
+                        List<Ticket> reservations = ticketRepository.findBySeatSeatId(seat.getSeatId());
                         if (!reservations.isEmpty()) {
                             bookedSeats++;
                             bookedSeatsInCompartment++;
@@ -246,7 +246,7 @@ public class TripService implements ITripService {
                 .sum();
 
         // Lấy danh sách vé đã đặt của chuyến tàu
-        List<TicketReservation> reservations = ticketReservationRepository.findByTripId(tripId);
+        List<Ticket> reservations = ticketRepository.findByTripIdAndStatusBookedOrHold(tripId);
 
         // Đếm số ghế đã bị đặt (BOOKED)
         int bookedSeats = (int) reservations.stream()
@@ -265,7 +265,7 @@ public class TripService implements ITripService {
                     // Ghế bị BOOKED nếu hành trình vé chồng lấn với hành trình yêu cầu
                     return resDepartureOrdinal < arrivalOrdinal && resArrivalOrdinal > departureOrdinal;
                 })
-                .map(TicketReservation::getSeat) // Lấy ghế từ vé
+                .map(Ticket::getSeat) // Lấy ghế từ vé
                 .distinct() // Loại bỏ ghế trùng (một ghế có thể bị đặt nhiều lần trong cùng trip)
                 .count();
 

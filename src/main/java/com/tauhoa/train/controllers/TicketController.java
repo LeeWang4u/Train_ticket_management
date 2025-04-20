@@ -1,69 +1,96 @@
 package com.tauhoa.train.controllers;
 
-import com.tauhoa.train.dtos.PassengerDTO;
-import com.tauhoa.train.dtos.TicketDTO;
-import com.tauhoa.train.dtos.TicketInformationDTO;
+import com.tauhoa.train.dtos.request.PassengerDTO;
+import com.tauhoa.train.dtos.request.ReservationCodeRequestDTO;
+import com.tauhoa.train.dtos.request.TicketRequestDTO;
+import com.tauhoa.train.dtos.request.TicketReservationReqDTO;
 import com.tauhoa.train.dtos.request.TicketSearchRequestDTO;
-import com.tauhoa.train.models.Customer;
-import com.tauhoa.train.models.ReservationCode;
-import com.tauhoa.train.models.Passenger;
-import com.tauhoa.train.models.Ticket;
-import com.tauhoa.train.services.InvoiceService;
-import com.tauhoa.train.services.PassengerService;
-import com.tauhoa.train.services.TicketService;
-import com.tauhoa.train.services.CustomerService;
+import com.tauhoa.train.dtos.response.TicketResponseDTO;
+import com.tauhoa.train.models.*;
+import com.tauhoa.train.repositories.TicketRepository;
+import com.tauhoa.train.repositories.TrainScheduleRepository;
+import com.tauhoa.train.services.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/tickets")
 public class TicketController {
     private final TicketService ticketService;
-   // private final InvoiceService invoiceService;
+    private final ReservationCodeService reservationCodeService;
     private final PassengerService passengerService;
     private final CustomerService customerService;
+    private final EmailService emailService;
+//    private final TicketRepository ticketRepository;
+//    private final TrainScheduleRepository trainScheduleRepository;
+//    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
     @PostMapping("/confirmTicket")
-    public ResponseEntity<String> bookTicket(@RequestBody @Valid TicketDTO request) {
+    public ResponseEntity<String> bookTicket(@RequestBody @Valid ReservationCodeRequestDTO request) {
         try {
             Customer customer = customerService.save(request.getCustomerDTO());
             BigDecimal totalPrice = BigDecimal.ZERO;
-            for (TicketInformationDTO res : request.getTicketInformationDTO()) {
+            for (TicketRequestDTO res : request.getTicketInformationDTO()) {
                 totalPrice = totalPrice.add(res.getTotalPrice());
             }
-            //ReservationCode invoice = invoiceService.save(totalPrice);
-            for (TicketInformationDTO res : request.getTicketInformationDTO()) {
+            ReservationCode reservationCode = reservationCodeService.save(totalPrice);
+            System.out.println(reservationCode);
+            for (TicketRequestDTO res : request.getTicketInformationDTO()) {
                 PassengerDTO passengerDTO = new PassengerDTO();
                 passengerDTO.setTicketType(res.getTicketType());
                 passengerDTO.setCccd(res.getCccd());
                 passengerDTO.setFullName(res.getFullName());
                 Passenger passenger = passengerService.save(passengerDTO);
-                ticketService.save(res, customer, passenger);
+                ticketService.save(res, customer, passenger,reservationCode);
             }
-
+            emailService.sendTicketEmail(customer,reservationCode.getReservationCodeId());
             return ResponseEntity.status(200).body("Đặt vé thành công!");
         }catch (Exception e) {
             return ResponseEntity.status(500).body("Lỗi khi đặt vé: " + e.getMessage() + request);
         }
     }
 
-    @PostMapping("/testTicket")
-    public ResponseEntity<String> testTicket(@RequestBody String request) {
+//    @GetMapping("/testTicket")
+//    public ResponseEntity<?> testTicket(@RequestParam int request) {
+//        try{
+//            Ticket ticket = ticketRepository.findByTicketId(request);
+//            Optional<TrainSchedule> departureTime = trainScheduleRepository.findByTrainIdAndStationId(ticket.getTrip().getTrain().getTrainId(), ticket.getDepartureStation().getStationId());
+//            Optional<TrainSchedule> arrivalTime = trainScheduleRepository.findByTrainIdAndStationId(ticket.getTrip().getTripId(), ticket.getArrivalStation().getStationId());
+//            String departureTimeString = departureTime.map(TrainSchedule::getDepartureTime).map(time -> time.format(timeFormatter))
+//                    .orElse("N/A");
+//                return ResponseEntity.status(200).body(departureTimeString);
+//        } catch (Exception e){
+//                return ResponseEntity.status(500).body(e.getMessage());
+//        }
+//    }
+
+    @PostMapping("/reserve")
+    public ResponseEntity<?> reserveTicket(@RequestBody @Valid TicketReservationReqDTO ticketReservationDTO){
         try{
-                System.out.println( request+"API được gọi được: " );
-                return ResponseEntity.status(200).body("Success");
+            TicketResponseDTO ticket = ticketService.saveReservation(ticketReservationDTO);
+            return ResponseEntity.status(200).body(ticket);
         } catch (Exception e){
-                return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+
+    }
+    @PostMapping("/deleteReserve")
+    public ResponseEntity<?> deleteTicketReservation(@RequestBody @Valid TicketReservationReqDTO ticketReservationDTO){
+        try {
+
+            ticketService.deleteTicket(ticketReservationDTO);
+            return ResponseEntity.status(200).body("Complete");
+        } catch (Exception e){
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 

@@ -1,6 +1,4 @@
-package com.tauhoa.train.dtos;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package com.tauhoa.train.dtos.request;
 
 import lombok.*;
 
