@@ -1,6 +1,6 @@
 package com.tauhoa.train.services;
 
-import com.tauhoa.train.dtos.PassengerDTO;
+import com.tauhoa.train.dtos.request.PassengerDTO;
 import com.tauhoa.train.models.Passenger;
 import com.tauhoa.train.repositories.PassengerRepository;
 import lombok.RequiredArgsConstructor;

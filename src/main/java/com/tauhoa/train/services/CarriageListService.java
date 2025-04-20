@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 public class CarriageListService implements ICarriageListService {
     private final CarriageListRepository carriageListRepository;
     private final SeatRepository seatRepository;
-    private final TicketReservationRepository ticketReservationRepository;
     private final TrainScheduleRepository trainScheduleRepository;
     private final TripRepository tripRepository;
     private final StationRepository stationRepository;
@@ -133,7 +132,7 @@ public class CarriageListService implements ICarriageListService {
         List<Seat> seats = seatRepository.findByCarriageListId(carriage.getCarriageListId());
 
         // Lấy danh sách vé của chuyến tàu
-        List<TicketReservation> reservations = ticketReservationRepository.findByTripId(tripId);
+        List<Ticket> reservations = ticketRepository.findByTripIdAndStatusBookedOrHold(tripId);
 
         // Lấy ordinalNumber và distance của ga đi và ga đến trong yêu cầu
         TrainSchedule departureSchedule = trainScheduleRepository.findByTrainIdAndStationId(carriage.getTrip().getTrain().getTrainId(), departureStationId)
@@ -225,7 +224,7 @@ public class CarriageListService implements ICarriageListService {
         }
 
         // Lấy danh sách vé của chuyến tàu
-        List<TicketReservation> reservations = ticketReservationRepository.findByTripId(tripId);
+        List<Ticket> reservations = ticketRepository.findByTripIdAndStatusBookedOrHold(tripId);
 
         // Lấy ordinalNumber và distance của ga đi và ga đến trong yêu cầu
         int trainId = carriages.get(0).getTrip().getTrain().getTrainId();
