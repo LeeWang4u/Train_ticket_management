@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket,Integer> {
-    List<Ticket> findByCustomer(Customer customer);
+    //List<Ticket> findByCustomer(Customer customer);
 
     Ticket findByTicketId(int ticketId);
 
@@ -28,5 +28,5 @@ public interface TicketRepository extends JpaRepository<Ticket,Integer> {
 
     List<Ticket> findBySeatSeatId(int seatId);
 
-    List<Ticket> findByReservationCodeReservationCodeId(int reservationCodeId);
+    List<Ticket> findByReservationCodeReservationCodeId(int reservationCode);
 }
