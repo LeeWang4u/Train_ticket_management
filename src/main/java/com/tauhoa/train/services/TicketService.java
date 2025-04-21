@@ -88,23 +88,26 @@ public class TicketService implements ITicketService {
     }
 
     @Override
-    public List<Ticket> findByCustomer(String cccd, String phone) {
-        if (cccd == null || cccd.isEmpty() || phone == null || phone.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<Customer> customers = customerRepository.findByCccdAndPhone(cccd, phone);
-        if (customers.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<Ticket> allTickets = new ArrayList<>();
-        for (Customer customer : customers) {
-            allTickets.addAll(ticketRepository.findByCustomer(customer));
-        }
-
-        return allTickets;
+    public List<Ticket> findByReservationCode(int reservationCode) {
+        return ticketRepository.findByReservationCodeReservationCodeId(reservationCode);
     }
 
-
+    //    @Override
+//    public List<Ticket> findByCustomer(String cccd, String phone) {
+//        if (cccd == null || cccd.isEmpty() || phone == null || phone.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//
+//        List<Customer> customers = customerRepository.findByCccdAndPhone(cccd, phone);
+//        if (customers.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//
+//        List<Ticket> allTickets = new ArrayList<>();
+//        for (Customer customer : customers) {
+//            allTickets.addAll(ticketRepository.findByCustomer(customer));
+//        }
+//
+//        return allTickets;
+//    }
 }

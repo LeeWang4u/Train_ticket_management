@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -110,20 +111,41 @@ public class TicketController {
         }
     }
 
-    @PostMapping("/searchCusTicket")
-    public ResponseEntity<?> searchTicketsByCustomer(@RequestBody TicketSearchRequestDTO request) {
-        String cccd = request.getCccd();
-        String phone = request.getPhone();
 
-        if (cccd == null || cccd.isEmpty() || phone == null || phone.isEmpty()) {
-            return ResponseEntity.badRequest().body("Vui lòng nhập đầy đủ cả CCCD và số điện thoại!");
+    @PostMapping("/searchByReservationCode")
+    public ResponseEntity<?> searchTicketByReservationCode(@RequestBody Map<String, Integer> request) {
+        Integer reservationCode = request.get("reservationCode");
+
+        if (reservationCode == null) {
+            return ResponseEntity.badRequest().body("Vui lòng cung cấp mã đặt vé!");
         }
 
-        List<Ticket> tickets = ticketService.findByCustomer(cccd, phone);
-        if (tickets.isEmpty()) {
-            return ResponseEntity.noContent().build();
+        try {
+            List<Ticket> tickets = ticketService.findByReservationCode(reservationCode);
+            if (tickets.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(tickets);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Không tìm thấy vé với mã đặt vé: " + reservationCode);
         }
-
-        return ResponseEntity.ok(tickets);
     }
+
+    //    @PostMapping("/searchCusTicket")
+//    public ResponseEntity<?> searchTicketsByCustomer(@RequestBody TicketSearchRequestDTO request) {
+//        String cccd = request.getCccd();
+//        String phone = request.getPhone();
+//
+//        if (cccd == null || cccd.isEmpty() || phone == null || phone.isEmpty()) {
+//            return ResponseEntity.badRequest().body("Vui lòng nhập đầy đủ cả CCCD và số điện thoại!");
+//        }
+//
+//        List<Ticket> tickets = ticketService.findByCustomer(cccd, phone);
+//        if (tickets.isEmpty()) {
+//            return ResponseEntity.noContent().build();
+//        }
+//
+//        return ResponseEntity.ok(tickets);
+//    }
 }
