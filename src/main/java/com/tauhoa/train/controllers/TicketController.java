@@ -39,12 +39,12 @@ public class TicketController {
         try {
             Customer customer = customerService.save(request.getCustomerDTO());
             BigDecimal totalPrice = BigDecimal.ZERO;
-            for (TicketRequestDTO res : request.getTicketInformationDTO()) {
+            for (TicketRequestDTO res : request.getTicketRequestDTO()) {
                 totalPrice = totalPrice.add(res.getTotalPrice());
             }
             ReservationCode reservationCode = reservationCodeService.save(totalPrice);
             System.out.println(reservationCode);
-            for (TicketRequestDTO res : request.getTicketInformationDTO()) {
+            for (TicketRequestDTO res : request.getTicketRequestDTO()) {
                 PassengerDTO passengerDTO = new PassengerDTO();
                 passengerDTO.setTicketType(res.getTicketType());
                 passengerDTO.setCccd(res.getCccd());

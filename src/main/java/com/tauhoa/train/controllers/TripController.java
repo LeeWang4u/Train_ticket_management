@@ -22,7 +22,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/trips")
+@RequestMapping("/api/trips")
 public class TripController {
     //@Autowired
     private final TripService tripService;
