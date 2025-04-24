@@ -27,11 +27,11 @@ public class ReservationCodeRequestDTO {
         this.customerDTO = customerDTO;
     }
 
-    public List<TicketRequestDTO> getTicketInformationDTO() {
+    public List<TicketRequestDTO> getTicketRequestDTO() {
         return ticketRequestDTO;
     }
 
-    public void setTicketInformationDTO(List<TicketRequestDTO> ticketRequestDTO) {
+    public void setTicketRequestDTO(List<TicketRequestDTO> ticketRequestDTO) {
         this.ticketRequestDTO = ticketRequestDTO;
     }
 }
