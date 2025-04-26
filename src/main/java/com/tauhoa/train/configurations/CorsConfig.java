@@ -20,6 +20,7 @@ public class CorsConfig {
                 "http://localhost:5173",
                 "http://localhost:5174"
         ));
+        corsConfig.setAllowedOrigins(List.of("*"));
         corsConfig.setAllowedMethods(List.of("*"));
         corsConfig.setAllowedHeaders(List.of("*"));
         corsConfig.setAllowCredentials(true);
