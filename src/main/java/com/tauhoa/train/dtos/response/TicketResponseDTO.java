@@ -18,5 +18,4 @@ public class TicketResponseDTO {
     private int seatId;
     private String trainName;
     private String routeName;
-    private LocalDate tripDate;
 }
