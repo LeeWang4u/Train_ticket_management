@@ -56,7 +56,7 @@ public class TicketService implements ITicketService {
         ticket.setArrivalStation(arrivalStation.get());
         ticket.setPurchaseTime(date);
         ticketRepository.save(ticket);
-        TicketResponseDTO ticketResponseDTO = new TicketResponseDTO(ticket.getTicketId(),ticketDTO.getTrip(),ticketDTO.getDepartureStation(),ticketDTO.getArrivalStation(),ticketDTO.getSeat(),trip.getTrain().getTrainName(),trip.getTrain().getRoute().getRouteName(),trip.getTripDate());
+        TicketResponseDTO ticketResponseDTO = new TicketResponseDTO(ticket.getTicketId(),ticketDTO.getTrip(),ticketDTO.getDepartureStation(),ticketDTO.getArrivalStation(),ticketDTO.getSeat(),trip.getTrain().getTrainName(),trip.getTrain().getRoute().getRouteName());
         return ticketResponseDTO;
     }
 
@@ -105,6 +105,9 @@ public class TicketService implements ITicketService {
 
         return allTickets;
     }
-
+    @Override
+    public List<Ticket> findByReservationCode(int reservationCode) {
+        return ticketRepository.findByReservationCodeReservationCodeId(reservationCode);
+    }
 
 }
