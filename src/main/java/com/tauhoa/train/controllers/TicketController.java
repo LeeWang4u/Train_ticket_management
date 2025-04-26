@@ -5,6 +5,7 @@ import com.tauhoa.train.dtos.request.ReservationCodeRequestDTO;
 import com.tauhoa.train.dtos.request.TicketRequestDTO;
 import com.tauhoa.train.dtos.request.TicketReservationReqDTO;
 import com.tauhoa.train.dtos.request.TicketSearchRequestDTO;
+import com.tauhoa.train.dtos.response.BookingResponse;
 import com.tauhoa.train.dtos.response.TicketResponseDTO;
 import com.tauhoa.train.models.*;
 import com.tauhoa.train.repositories.TicketRepository;
@@ -36,16 +37,16 @@ public class TicketController {
 //    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
     @PostMapping("/confirmTicket")
-    public ResponseEntity<String> bookTicket(@RequestBody @Valid ReservationCodeRequestDTO request) {
+    public ResponseEntity<?> bookTicket(@RequestBody @Valid ReservationCodeRequestDTO request) {
         try {
             Customer customer = customerService.save(request.getCustomerDTO());
             BigDecimal totalPrice = BigDecimal.ZERO;
-            for (TicketRequestDTO res : request.getTicketInformationDTO()) {
+            for (TicketRequestDTO res : request.getTicketRequestDTO()) {
                 totalPrice = totalPrice.add(res.getTotalPrice());
             }
             ReservationCode reservationCode = reservationCodeService.save(totalPrice);
             System.out.println(reservationCode);
-            for (TicketRequestDTO res : request.getTicketInformationDTO()) {
+            for (TicketRequestDTO res : request.getTicketRequestDTO()) {
                 PassengerDTO passengerDTO = new PassengerDTO();
                 passengerDTO.setTicketType(res.getTicketType());
                 passengerDTO.setCccd(res.getCccd());
@@ -54,9 +55,15 @@ public class TicketController {
                 ticketService.save(res, customer, passenger,reservationCode);
             }
             emailService.sendTicketEmail(customer,reservationCode.getReservationCodeId());
-            return ResponseEntity.status(200).body("Đặt vé thành công!");
+            BookingResponse response = new BookingResponse();
+            response.setStatus("success");
+            response.setMessage("Đặt vé thành công");
+            return ResponseEntity.status(200).body(response);
         }catch (Exception e) {
-            return ResponseEntity.status(500).body("Lỗi khi đặt vé: " + e.getMessage() + request);
+            BookingResponse response = new BookingResponse();
+            response.setStatus("error");
+            response.setMessage("Đặt vé thất bại!");
+            return ResponseEntity.status(500).body(response);
         }
     }
 
@@ -87,13 +94,22 @@ public class TicketController {
     @PostMapping("/deleteReserve")
     public ResponseEntity<?> deleteTicketReservation(@RequestBody @Valid TicketReservationReqDTO ticketReservationDTO){
         try {
-
             ticketService.deleteTicket(ticketReservationDTO);
-            return ResponseEntity.status(200).body("Complete");
+
+            // Trả về đối tượng BookingResponse thay vì chuỗi văn bản
+            BookingResponse response = new BookingResponse();
+            response.setStatus("success");
+            response.setMessage("Hủy giữ vé thành công!");
+            return ResponseEntity.status(200).body(response);
         } catch (Exception e){
-            return ResponseEntity.status(500).body(e.getMessage());
+            // Trả về đối tượng BookingResponse với thông báo lỗi
+            BookingResponse errorResponse = new BookingResponse();
+            errorResponse.setStatus("error");
+            errorResponse.setMessage(e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
         }
     }
+
 
     @PostMapping("/searchTicket")
     public ResponseEntity<?> searchTicketById(@RequestBody TicketSearchRequestDTO request) {
@@ -132,20 +148,4 @@ public class TicketController {
         }
     }
 
-    //    @PostMapping("/searchCusTicket")
-//    public ResponseEntity<?> searchTicketsByCustomer(@RequestBody TicketSearchRequestDTO request) {
-//        String cccd = request.getCccd();
-//        String phone = request.getPhone();
-//
-//        if (cccd == null || cccd.isEmpty() || phone == null || phone.isEmpty()) {
-//            return ResponseEntity.badRequest().body("Vui lòng nhập đầy đủ cả CCCD và số điện thoại!");
-//        }
-//
-//        List<Ticket> tickets = ticketService.findByCustomer(cccd, phone);
-//        if (tickets.isEmpty()) {
-//            return ResponseEntity.noContent().build();
-//        }
-//
-//        return ResponseEntity.ok(tickets);
-//    }
 }
