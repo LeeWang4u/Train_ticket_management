@@ -16,11 +16,11 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(List.of(
-                "http://localhost:5173",
-                "http://localhost:5174"
-        ));
-        corsConfig.setAllowedOrigins(List.of("*"));
+//        corsConfig.setAllowedOrigins(List.of(
+//                "http://localhost:5173",
+//                "http://localhost:5174"
+//        ));
+        corsConfig.setAllowedOriginPatterns(List.of("*"));
         corsConfig.setAllowedMethods(List.of("*"));
         corsConfig.setAllowedHeaders(List.of("*"));
         corsConfig.setAllowCredentials(true);
