@@ -7,6 +7,7 @@ import com.tauhoa.train.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 
 import java.util.List;
 
@@ -23,6 +24,10 @@ public class UserService {
 
     public List<User> findAllUsers() {
         return userRepository.findAll();
+    }
+
+    public Optional<User> findById(Long userId) {
+        return userRepository.findById(userId);
     }
 
     public User create(UserCreateRequestDto userCreateRequestDto) {

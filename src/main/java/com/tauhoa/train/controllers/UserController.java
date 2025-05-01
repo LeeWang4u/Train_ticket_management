@@ -20,6 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class UserController {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -30,6 +31,26 @@ public class UserController {
         return userService.findAllUsers();
     }
 
+    @GetMapping("/currentUser")
+    public ResponseEntity<CommonResponse> getCurrentUser(@RequestHeader("Authorization") String authorizationHeader) {
+        String token = authorizationHeader.replace("Bearer ", "").trim();
+
+        Claims claims = jwtTokenProvider.getClaims(token);
+        String userId = claims.getSubject();
+
+        User user = userService.findById(Long.parseLong(userId))
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (user == null) {
+            return new ResponseEntity<>(new CommonResponse(HttpStatus.UNAUTHORIZED, "User not found", null), HttpStatus.UNAUTHORIZED);
+        }
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("userid", user.getUserId());
+        userInfo.put("name", user.getUserName());
+        userInfo.put("email", user.getEmail());
+
+        return new ResponseEntity<>(new CommonResponse(HttpStatus.OK, "OK", userInfo), HttpStatus.OK);
+    }
     @PostMapping("/user/create")
     public ResponseEntity<CommonResponse> userCreate(@Valid @RequestBody UserCreateRequestDto userCreateRequestDto) {
         User user = userService.create(userCreateRequestDto);

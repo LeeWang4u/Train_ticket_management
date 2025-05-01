@@ -16,20 +16,15 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-
 //        corsConfig.setAllowedOrigins(List.of(
 //                "http://localhost:5173",
 //                "http://localhost:5174"
 //        ));
-//        corsConfig.setAllowedMethods(List.of("*"));
-//        corsConfig.setAllowedHeaders(List.of("*"));
-//        corsConfig.setAllowCredentials(true);
-        corsConfig.setAllowedOrigins(List.of("*")); // Cho phép tất cả nguồn (bao gồm ứng dụng Android)
-
+        corsConfig.setAllowedOriginPatterns(List.of("*"));
         corsConfig.setAllowedMethods(List.of("*"));
         corsConfig.setAllowedHeaders(List.of("*"));
-        corsConfig.setAllowCredentials(false); // Đặt thành false khi dùng allowedOrigins là "*"
-        
+        corsConfig.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);
         return source;
