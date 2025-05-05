@@ -17,6 +17,6 @@ public interface ITripService {
     List<TrainInfoDTO> getTrainInfoByStationAndDate(String stationName, LocalDate date);
     Trip findByTripId(int tripId);
 //    List<TripResponseDTO> findTrips(String departureStation, String arrivalStation, LocalDate tripDate);
-Trip addTrip(AddTripRequestDTO request);
+    Trip addTrip(AddTripRequestDTO request);
     List<TripResponseDTO> findTripsByStationsAndDate(TripSearchRequestDTO request);
 }
