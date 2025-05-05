@@ -1,5 +1,6 @@
 package com.tauhoa.train.controllers;
 
+import com.tauhoa.train.common.ApiResponse;
 import com.tauhoa.train.dtos.request.AddTripRequestDTO;
 import com.tauhoa.train.dtos.response.ErrorResponse;
 import com.tauhoa.train.dtos.response.TripResponseDTO;
@@ -111,18 +112,22 @@ public class TripController {
             LocalDate tripDate = request.getTripDate();
             List<Trip> existingTrips = tripRepository.findByTrainAndTripDate(train, tripDate);
             if (!existingTrips.isEmpty()) {
-                return ResponseEntity.status(409) // Conflict
-                        .body(new ErrorResponse("Tàu này đã được tạo trong ngày này: " + request.getTripDate(), existingTrips.get(0)));
-
+//                return ResponseEntity.status(409) // Conflict
+//                        .body(new ErrorResponse("Tàu này đã được tạo trong ngày này: " + request.getTripDate(), existingTrips.get(0)));
+                return ResponseEntity.status(409).body(
+                        ApiResponse.failure("Tàu này đã được tạo trong ngày này: " + request.getTripDate(), existingTrips.get(0))
+                );
             }
             Trip trip = tripService.addTrip(request);
 
             // Nếu là chuyến mới tạo
-            return ResponseEntity.ok(trip);
+            return ResponseEntity.ok(ApiResponse.success(trip, "Tạo chuyến thành công"));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(400).body(new ErrorResponse(e.getMessage(), null));
+//            return ResponseEntity.status(400).body(new ErrorResponse(e.getMessage(), null));
+            return ResponseEntity.badRequest().body(ApiResponse.failure(e.getMessage(), null));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorResponse("An error occurred: " + e.getMessage(), null));
+//            return ResponseEntity.status(500).body(new ErrorResponse("An error occurred: " + e.getMessage(), null));
+            return ResponseEntity.status(500).body(ApiResponse.failure("Đã xảy ra lỗi: " + e.getMessage(), null));
         }
     }
 
