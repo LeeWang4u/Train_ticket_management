@@ -6,8 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import com.tauhoa.train.dtos.response.TicketCountResponseDTO;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket,Integer> {
@@ -29,4 +32,13 @@ public interface TicketRepository extends JpaRepository<Ticket,Integer> {
     List<Ticket> findBySeatSeatId(int seatId);
 
     List<Ticket> findByReservationCodeReservationCodeId(int reservationCodeId);
+
+    @Query("SELECT t FROM Ticket t WHERE t.purchaseTime BETWEEN :startDate AND :endDate AND t.ticketStatus = 'Booked'")
+    List<Ticket> findTicketsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+
+    @Query("SELECT new com.tauhoa.train.dtos.response.TicketCountResponseDTO(t.departureStation.stationName, t.arrivalStation.stationName, COUNT(t)) " +
+            "FROM Ticket t " +
+            "WHERE t.ticketStatus = 'Booked' " +
+            "GROUP BY t.departureStation.stationName, t.arrivalStation.stationName")
+    List<TicketCountResponseDTO> findTicketCountGroupedByStations();
 }

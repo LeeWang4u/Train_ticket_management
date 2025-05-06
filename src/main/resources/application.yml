@@ -13,7 +13,7 @@ spring:
 #    url: jdbc:mysql://localhost:3306/db_train_ticket_system?useSSL=false&serverTimezone=UTC
     url: jdbc:mysql://localhost:3306/train_ticket_system?useSSL=false&serverTimezone=UTC
     username: root
-    password: ""
+    password: 123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
