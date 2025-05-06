@@ -1,11 +1,8 @@
 package com.tauhoa.train.controllers;
 
-import com.tauhoa.train.dtos.request.PassengerDTO;
-import com.tauhoa.train.dtos.request.ReservationCodeRequestDTO;
-import com.tauhoa.train.dtos.request.TicketRequestDTO;
-import com.tauhoa.train.dtos.request.TicketReservationReqDTO;
-import com.tauhoa.train.dtos.request.TicketSearchRequestDTO;
+import com.tauhoa.train.dtos.request.*;
 import com.tauhoa.train.dtos.response.BookingResponse;
+import com.tauhoa.train.dtos.response.TicketCountResponseDTO;
 import com.tauhoa.train.dtos.response.TicketResponseDTO;
 import com.tauhoa.train.models.*;
 import com.tauhoa.train.repositories.TicketRepository;
@@ -18,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -148,4 +147,24 @@ public class TicketController {
         }
     }
 
+    @PostMapping("/from-to")
+    public ResponseEntity<?> getTicketsFromTo(@Valid @RequestBody TicketDateRangeRequestDTO request) {
+        LocalDate start = LocalDate.parse(request.getStartDate());
+        LocalDate end = LocalDate.parse(request.getEndDate());
+
+        LocalDateTime startDateTime = start.atStartOfDay();
+        LocalDateTime endDateTime = end.atTime(23, 59, 59);
+
+        List<TicketResponseDTO> tickets = ticketService.getTicketsBetween(startDateTime, endDateTime);
+
+        return tickets.isEmpty()
+                ? ResponseEntity.status(404).body("No tickets found.")
+                : ResponseEntity.ok(tickets);
+    }
+
+    @GetMapping("/ticket-summary")
+    public ResponseEntity<List<TicketCountResponseDTO>> getTicketSummary() {
+        List<TicketCountResponseDTO> ticketSummary = ticketService.getTicketCountGroupedByStations();
+        return ResponseEntity.ok(ticketSummary);
+    }
 }

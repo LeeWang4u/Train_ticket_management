@@ -35,4 +35,36 @@ public class Train {
         this.trainName = trainName;
         this.route = route;
     }
+
+    public int getTrainId() {
+        return trainId;
+    }
+
+    public void setTrainId(int trainId) {
+        this.trainId = trainId;
+    }
+
+    public String getTrainName() {
+        return trainName;
+    }
+
+    public void setTrainName(String trainName) {
+        this.trainName = trainName;
+    }
+
+    public List<TrainSchedule> getTrainSchedules() {
+        return trainSchedules;
+    }
+
+    public void setTrainSchedules(List<TrainSchedule> trainSchedules) {
+        this.trainSchedules = trainSchedules;
+    }
+
+    public Route getRoute() {
+        return route;
+    }
+
+    public void setRoute(Route route) {
+        this.route = route;
+    }
 }
