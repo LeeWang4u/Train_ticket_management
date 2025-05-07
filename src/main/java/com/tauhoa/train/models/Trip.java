@@ -39,4 +39,44 @@ public class Trip {
         this.tripDate = tripDate;
         this.tripStatus = tripStatus;
     }
+
+    public int getTripId() {
+        return tripId;
+    }
+
+    public void setTripId(int tripId) {
+        this.tripId = tripId;
+    }
+
+    public Train getTrain() {
+        return train;
+    }
+
+    public void setTrain(Train train) {
+        this.train = train;
+    }
+
+    public BigDecimal getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(BigDecimal basePrice) {
+        this.basePrice = basePrice;
+    }
+
+    public LocalDate getTripDate() {
+        return tripDate;
+    }
+
+    public void setTripDate(LocalDate tripDate) {
+        this.tripDate = tripDate;
+    }
+
+    public String getTripStatus() {
+        return tripStatus;
+    }
+
+    public void setTripStatus(String tripStatus) {
+        this.tripStatus = tripStatus;
+    }
 }

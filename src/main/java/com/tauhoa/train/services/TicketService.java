@@ -2,6 +2,7 @@ package com.tauhoa.train.services;
 
 import com.tauhoa.train.dtos.request.TicketRequestDTO;
 import com.tauhoa.train.dtos.request.TicketReservationReqDTO;
+import com.tauhoa.train.dtos.response.TicketCountResponseDTO;
 import com.tauhoa.train.dtos.response.TicketResponseDTO;
 import com.tauhoa.train.models.*;
 import com.tauhoa.train.repositories.CustomerRepository;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -108,6 +110,19 @@ public class TicketService implements ITicketService {
     @Override
     public List<Ticket> findByReservationCode(int reservationCode) {
         return ticketRepository.findByReservationCodeReservationCodeId(reservationCode);
+    }
+
+    @Override
+    public List<TicketResponseDTO> getTicketsBetween(LocalDateTime start, LocalDateTime end) {
+        List<Ticket> tickets = ticketRepository.findTicketsByDateRange(start, end);
+        return tickets.stream()
+                .map(TicketResponseDTO::toTicketResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TicketCountResponseDTO> getTicketCountGroupedByStations() {
+        return ticketRepository.findTicketCountGroupedByStations();
     }
 
 }
