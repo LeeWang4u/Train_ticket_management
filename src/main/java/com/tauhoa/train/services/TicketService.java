@@ -2,6 +2,8 @@ package com.tauhoa.train.services;
 
 import com.tauhoa.train.dtos.request.TicketRequestDTO;
 import com.tauhoa.train.dtos.request.TicketReservationReqDTO;
+import com.tauhoa.train.dtos.response.DailySalesResponseDTO;
+import com.tauhoa.train.dtos.response.MonthlySalesResonseDTO;
 import com.tauhoa.train.dtos.response.TicketCountResponseDTO;
 import com.tauhoa.train.dtos.response.TicketResponseDTO;
 import com.tauhoa.train.models.*;
@@ -10,6 +12,8 @@ import com.tauhoa.train.repositories.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -125,4 +129,23 @@ public class TicketService implements ITicketService {
         return ticketRepository.findTicketCountGroupedByStations();
     }
 
+    @Override
+    public List<MonthlySalesResonseDTO> getMonthlySales(LocalDateTime from, LocalDateTime to) {
+        return ticketRepository.getMonthlySalesByPurchaseTime(from, to);
+    }
+
+    @Override
+    public List<DailySalesResponseDTO> getDailySales(LocalDateTime from, LocalDateTime to) {
+        List<Ticket> tickets = ticketRepository.findTicketsByDateRange(from, to);
+        return tickets.stream()
+                .map(ticket -> {
+                    LocalDate date = ticket.getPurchaseTime().toLocalDate();
+                    return new DailySalesResponseDTO(date, ticket.getPrice());
+                })
+                .collect(Collectors.toList());
+    }
+
+    public BigDecimal getTotalRevenue() {
+        return ticketRepository.getTotalPriceSum();
+    }
 }
