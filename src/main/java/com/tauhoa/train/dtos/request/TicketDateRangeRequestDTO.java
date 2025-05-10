@@ -15,4 +15,6 @@ import lombok.Setter;
 
     @NotNull(message = "End date is required")
     private String endDate;
+
+    private String type = "raw";
 }

@@ -2,10 +2,13 @@ package com.tauhoa.train.services;
 
 import com.tauhoa.train.dtos.request.TicketRequestDTO;
 import com.tauhoa.train.dtos.request.TicketReservationReqDTO;
+import com.tauhoa.train.dtos.response.DailySalesResponseDTO;
+import com.tauhoa.train.dtos.response.MonthlySalesResonseDTO;
 import com.tauhoa.train.dtos.response.TicketCountResponseDTO;
 import com.tauhoa.train.dtos.response.TicketResponseDTO;
 import com.tauhoa.train.models.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,4 +22,7 @@ public interface ITicketService {
     List<Ticket> findByReservationCode(int reservationCode);
     List<TicketResponseDTO> getTicketsBetween(LocalDateTime start, LocalDateTime end);
     List<TicketCountResponseDTO> getTicketCountGroupedByStations();
+    List<MonthlySalesResonseDTO> getMonthlySales(LocalDateTime from, LocalDateTime to);
+    List<DailySalesResponseDTO> getDailySales (LocalDateTime from, LocalDateTime to);
+    public BigDecimal getTotalRevenue();
 }
