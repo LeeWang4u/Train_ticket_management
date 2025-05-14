@@ -15,5 +15,9 @@ public interface IStationService {
 
     Optional<Station> findByStationName(String stationName);
 
+    Station createStation(Station station);
 
+    Station updateStation(int id, Station station);
+
+    boolean deleteStation(int id);
 }
