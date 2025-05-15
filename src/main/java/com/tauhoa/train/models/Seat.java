@@ -1,6 +1,7 @@
 package com.tauhoa.train.models;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +31,7 @@ public class Seat {
 
     @ManyToOne
     @JoinColumn(name = "carriage_list_id", nullable = false)
+    @JsonBackReference
     private CarriageList carriageList;
 
     @Column(name = "seat_status", nullable = false)
