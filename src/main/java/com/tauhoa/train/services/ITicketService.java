@@ -15,4 +15,5 @@ public interface ITicketService {
     Ticket findByTicketId(Integer ticketId);
     List<Ticket> findByCustomer(String cccd, String phone);
     List<Ticket> findByReservationCode(int reservationCode);
+    void cancelTicketByTrip(int tripId);
 }

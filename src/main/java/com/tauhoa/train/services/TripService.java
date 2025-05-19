@@ -421,4 +421,16 @@ public class TripService implements ITripService {
         return tripRepository;
     }
 
+    public void cancelTrip(int tripId) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new IllegalArgumentException("Trip not found for tripId: " + tripId));
+
+        if (!trip.getTripStatus().equals("Scheduled")) {
+            throw new IllegalArgumentException("Cannot cancel a trip that is not scheduled");
+        }
+
+        trip.setTripStatus("Cancelled");
+        tripRepository.save(trip);
+
+    }
 }

@@ -127,5 +127,59 @@ public class EmailService implements IEmailService {
         }
     }
 
+    @Override
+    public void sendEmailCancelTicket(Ticket ticket) {
+        Customer customer = ticket.getCustomer();
+        String subject = "Hủy vé - Mã đặt chỗ: " + ticket.getReservationCode().getReservationCodeId();
+        String html = String.format("""
+            <html>
+            <head>
+              <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; }
+                .cancel-info {
+                  background-color: #fff3f3;
+                  padding: 20px;
+                  border: 1px solid #ffcccc;
+                  border-radius: 10px;
+                  margin: 20px;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="cancel-info">
+                <h2>THÔNG BÁO HỦY VÉ</h2>
+                <p>Xin chào <strong>%s</strong>,</p>
+                <p>Vé có mã <strong>%s</strong> cho hành trình <strong>%s → %s</strong> đã được hủy.</p>
+                <p>Do chúng tôi đã ngừng khai thác chuyến tàu này, nên vé của bạn đã bị hủy và bạn sẽ được hoàn tiền trong 3 ngày tới.
+                <p>Chúng tôi rất tiếc vì sự bất tiện này và hy vọng bạn sẽ sử dụng lại dịch vụ chúng tôi trong tương lai.</p>
+                <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ bộ phận hỗ trợ khách hàng.</p>
+              </div>
+            </body>
+            </html>
+            """,
+                customer.getFullname(),
+                ticket.getTicketId(),
+                ticket.getDepartureStation().getStationName(),
+                ticket.getArrivalStation().getStationName());
+        sendEmailCancel(customer.getEmail(), subject, html);
+    }
+    @Override
+    public void sendEmailCancel(String toEmail, String subject , String html) {
+        MimeMessage message = mailSender.createMimeMessage();
+
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom("duongsatvietnam@gmail.com");
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(html, true);
+
+            mailSender.send(message);
+            System.out.println("Đã gửi email hủy vé tới " + toEmail);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi gửi email hủy vé: " + e.getMessage());
+        }
+    }
 }
 
