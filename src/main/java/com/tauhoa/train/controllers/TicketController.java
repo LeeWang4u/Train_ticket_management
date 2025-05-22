@@ -2,6 +2,7 @@ package com.tauhoa.train.controllers;
 
 import com.tauhoa.train.dtos.request.*;
 import com.tauhoa.train.dtos.response.*;
+
 import com.tauhoa.train.models.*;
 import com.tauhoa.train.repositories.TicketRepository;
 import com.tauhoa.train.repositories.TrainScheduleRepository;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -139,6 +141,48 @@ public class TicketController {
                 return ResponseEntity.noContent().build();
             }
             return ResponseEntity.ok(tickets);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Không tìm thấy vé với mã đặt vé: " + reservationCode);
+        }
+    }
+
+    @GetMapping("/searchTicketByIdAndroid")
+    public ResponseEntity<?> searchTicketByIdAndroid(@RequestParam int ticketId) {
+        try {
+            System.out.println(ticketId);
+            Ticket ticket = ticketService.findByTicketId(ticketId);
+            SearchTicketResponse searchTicketResponse = new SearchTicketResponse(ticket.getTicketId(),
+                    ticket.getPassenger().getFullname(),
+                    ticket.getDepartureStation().getStationName(),
+                    ticket.getArrivalStation().getStationName(),
+                    ticket.getSeat().getSeatNumber(),
+                    ticket.getTrip().getTrain().getTrainName());
+            return ResponseEntity.ok(searchTicketResponse);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Không tìm thấy vé với ID: " + ticketId);
+        }
+    }
+
+    @GetMapping("/searchTicketByReservationCodeAndroid")
+    public ResponseEntity<?> searchTicketByReservationCodeAndroid(@RequestParam int reservationCode) {
+        try {
+            List<Ticket> tickets = ticketService.findByReservationCode(reservationCode);
+            List<SearchTicketResponse> ticketResponseDTOList = new ArrayList<>();
+            for (Ticket ticket : tickets) {
+                SearchTicketResponse searchTicketResponse = new SearchTicketResponse(ticket.getTicketId(),
+                        ticket.getPassenger().getFullname(),
+                        ticket.getDepartureStation().getStationName(),
+                        ticket.getArrivalStation().getStationName(),
+                        ticket.getSeat().getSeatNumber(),
+                        ticket.getTrip().getTrain().getTrainName());
+                ticketResponseDTOList.add(searchTicketResponse);
+            }
+            if (tickets.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(ticketResponseDTOList);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Không tìm thấy vé với mã đặt vé: " + reservationCode);

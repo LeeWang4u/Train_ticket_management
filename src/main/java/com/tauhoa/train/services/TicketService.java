@@ -30,6 +30,7 @@ public class TicketService implements ITicketService {
     private final TripService tripService;
     private final SeatService seatService;
     private final StationService stationService;
+    private final EmailService emailService;
 
 
     @Override
@@ -117,6 +118,20 @@ public class TicketService implements ITicketService {
     }
 
     @Override
+
+    public void cancelTicketByTrip(int tripId){
+        List<Ticket> tickets = ticketRepository.findByTripIdAndStatusBookedOrHold(tripId);
+        for (Ticket ticket : tickets) {
+            if(ticket.getTicketStatus().equals("Booked")){
+                ticket.setTicketStatus("Canceled");
+                ticketRepository.save(ticket);
+                emailService.sendEmailCancelTicket(ticket);
+            } else{
+               ticketRepository.delete(ticket);
+            }
+
+        }
+
     public List<TicketResponseDTO> getTicketsBetween(LocalDateTime start, LocalDateTime end) {
         List<Ticket> tickets = ticketRepository.findTicketsByDateRange(start, end);
         return tickets.stream()
