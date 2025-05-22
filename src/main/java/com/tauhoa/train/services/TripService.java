@@ -433,4 +433,12 @@ public class TripService implements ITripService {
         tripRepository.save(trip);
 
     }
+    public List<Trip> getAllTrips() {
+        return tripRepository.findAll();
+    }
+
+    public Optional<Trip> getTripById(int id) {
+        return tripRepository.findById(id);
+    }
+
 }

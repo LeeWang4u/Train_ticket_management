@@ -17,13 +17,11 @@ public class TrainScheduleService implements ITrainScheduleService {
         this.trainScheduleRepository = trainScheduleRepository;
     }
 
-    // Lấy tất cả lịch tàu
     @Override
     public List<TrainSchedule> getAllSchedules() {
         return trainScheduleRepository.findAll();
     }
 
-    // Các phương thức khác cho CRUD (nếu cần)
     @Override
     public TrainSchedule saveSchedule(TrainSchedule schedule) {
         return trainScheduleRepository.save(schedule);
