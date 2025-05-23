@@ -10,4 +10,5 @@ public interface IEmailService {
     void sendEmailCancelTicket(Ticket ticket);
     void sendEmailCancel(String toEmail, String subject , String html);
     void sendOtpToEmail(String email);
+
 }

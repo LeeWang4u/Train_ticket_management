@@ -5,6 +5,7 @@ import com.tauhoa.train.models.User;
 import com.tauhoa.train.securities.JwtTokenProvider;
 import com.tauhoa.train.securities.RefreshTokenService;
 import com.tauhoa.train.services.EmailService;
+
 import com.tauhoa.train.services.UserService;
 import com.tauhoa.train.dtos.request.UserCreateRequestDto;
 import com.tauhoa.train.dtos.request.LoginRequestDto;
@@ -27,6 +28,7 @@ public class UserController {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+
     private final EmailService emailService;
 
     @GetMapping("/users")

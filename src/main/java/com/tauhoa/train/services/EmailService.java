@@ -6,7 +6,6 @@ import com.tauhoa.train.models.Ticket;
 import com.tauhoa.train.models.TrainSchedule;
 import com.tauhoa.train.repositories.TicketRepository;
 import com.tauhoa.train.repositories.TrainScheduleRepository;
-//import com.tauhoa.train.repositories.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +16,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +32,7 @@ public class EmailService implements IEmailService {
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
+
 
     DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
