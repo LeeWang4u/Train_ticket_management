@@ -1,6 +1,10 @@
 package com.tauhoa.train.services;
 
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
 import com.tauhoa.train.models.Customer;
 import com.tauhoa.train.models.Ticket;
 import com.tauhoa.train.models.TrainSchedule;
@@ -15,9 +19,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +50,9 @@ public class EmailService implements IEmailService {
         StringBuilder ticketsHtml = new StringBuilder();
 
         for (Ticket ticket : tickets) {
+            String qrData = "Ticket ID: " + ticket.getTicketId()+ " Tên Hành Khách: "+ticket.getPassenger().getFullname();
+            String qrBase64 = generateQRCodeBase64(qrData);
+            String qrImgTag = "<img src=\"data:image/png;base64," + qrBase64 + "\" width=\"150\" height=\"150\"/>";
             Optional<TrainSchedule> departureTime = trainScheduleRepository.findByTrainIdAndStationId(ticket.getTrip().getTrain().getTrainId(), ticket.getDepartureStation().getStationId());
             Optional<TrainSchedule> arrivalTime = trainScheduleRepository.findByTrainIdAndStationId(ticket.getTrip().getTrain().getTrainId(), ticket.getArrivalStation().getStationId());
             String departureTimeString = departureTime.map(TrainSchedule::getArrivalTime).map(time -> time.format(timeFormatter))
@@ -63,6 +69,7 @@ public class EmailService implements IEmailService {
                               <p><strong>Đối tượng:</strong> %s</p>
                               <p><strong>Chỗ ngồi:</strong>Toa %s - Ghế %s</p>
                               <p><strong>Mã vé:</strong> %s</p>
+                              <p><strong>QR Code:</strong><br/>%s</p>
                             </div>
                             <hr/>
                             """,
@@ -75,7 +82,8 @@ public class EmailService implements IEmailService {
                     ticket.getPassenger().getTicketType().getTicketTypeName(),
                     String.valueOf(ticket.getSeat().getCarriageList().getStt()),
                     String.valueOf(ticket.getSeat().getSeatNumber()),
-                    String.valueOf(ticket.getTicketId())));
+                    String.valueOf(ticket.getTicketId()),
+                    qrImgTag));
         }
         String html = String.format("""
                 <html>
@@ -226,6 +234,27 @@ public class EmailService implements IEmailService {
         }
 
         System.out.println("OTP sent to: " + email);
+    }
+
+    public String generateQRCodeBase64(String data) {
+        try {
+            int width = 200;
+            int height = 200;
+
+            BitMatrix bitMatrix = new MultiFormatWriter()
+                    .encode(data, BarcodeFormat.QR_CODE, width, height);
+
+            BufferedImage qrImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(qrImage, "png", baos);
+            byte[] imageBytes = baos.toByteArray();
+
+            return Base64.getEncoder().encodeToString(imageBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
 
