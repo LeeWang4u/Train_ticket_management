@@ -119,18 +119,19 @@ public class TicketService implements ITicketService {
 
     @Override
 
-    public void cancelTicketByTrip(int tripId){
+    public void cancelTicketByTrip(int tripId) {
         List<Ticket> tickets = ticketRepository.findByTripIdAndStatusBookedOrHold(tripId);
         for (Ticket ticket : tickets) {
-            if(ticket.getTicketStatus().equals("Booked")){
+            if (ticket.getTicketStatus().equals("Booked")) {
                 ticket.setTicketStatus("Canceled");
                 ticketRepository.save(ticket);
                 emailService.sendEmailCancelTicket(ticket);
-            } else{
-               ticketRepository.delete(ticket);
+            } else {
+                ticketRepository.delete(ticket);
             }
 
         }
+    }
 
     public List<TicketResponseDTO> getTicketsBetween(LocalDateTime start, LocalDateTime end) {
         List<Ticket> tickets = ticketRepository.findTicketsByDateRange(start, end);

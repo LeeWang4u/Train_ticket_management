@@ -9,9 +9,13 @@ import com.tauhoa.train.repositories.TrainScheduleRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -23,6 +27,12 @@ public class EmailService implements IEmailService {
 
     private final TicketRepository ticketRepository;
     private final TrainScheduleRepository trainScheduleRepository;
+//    private final UserRepository userRepository;
+
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
 
     DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -180,6 +190,42 @@ public class EmailService implements IEmailService {
             e.printStackTrace();
             System.err.println("Lỗi gửi email hủy vé: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void sendOtpToEmail(String email) {
+//        if (userRepository.findByEmail(email).isPresent()) {
+//            throw new IllegalArgumentException("This email is already in use.");
+//        }
+        String throttleKey = "OTP_THROTTLE::" + email;
+
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(throttleKey))) {
+            throw new IllegalArgumentException("Please wait before requesting another OTP.");
+        }
+
+        redisTemplate.opsForValue().set(throttleKey, "1", Duration.ofSeconds(30));
+
+        String otp = String.valueOf((int) (Math.random() * 900000) + 100000);
+        redisTemplate.opsForValue().set("OTP::" + email, otp, Duration.ofMinutes(5));
+
+        String html = "<p>Your OTP code is: <strong>" + otp + "</strong></p>";
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom("duongsatvietnam@gmail.com");
+            helper.setTo(email);
+            helper.setSubject("Your OTP Code");
+            helper.setText(html, true);
+
+            mailSender.send(message);
+            System.out.println("OTP sent to: " + email);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            System.err.println("Failed to send OTP email: " + e.getMessage());
+            throw new IllegalStateException("Failed to send OTP email.");
+        }
+
+        System.out.println("OTP sent to: " + email);
     }
 }
 

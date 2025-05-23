@@ -1,8 +1,11 @@
 package com.tauhoa.train.controllers;
 
+import com.tauhoa.train.dtos.request.ChangePasswordRequestDto;
 import com.tauhoa.train.models.User;
 import com.tauhoa.train.securities.JwtTokenProvider;
 import com.tauhoa.train.securities.RefreshTokenService;
+import com.tauhoa.train.services.EmailService;
+
 import com.tauhoa.train.services.UserService;
 import com.tauhoa.train.dtos.request.UserCreateRequestDto;
 import com.tauhoa.train.dtos.request.LoginRequestDto;
@@ -25,6 +28,8 @@ public class UserController {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+
+    private final EmailService emailService;
 
     @GetMapping("/users")
     public List<User> findAllUsers() {
@@ -81,5 +86,18 @@ public class UserController {
         String userId = claims.getSubject();
         refreshTokenService.deleteRefreshToken(userId);
         return new ResponseEntity<>(new CommonResponse(HttpStatus.OK, "Logout Success", null), HttpStatus.OK);
+    }
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<CommonResponse> sendOtp(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        emailService.sendOtpToEmail(email);
+        return new ResponseEntity<>(new CommonResponse(HttpStatus.OK, "OTP sent!", null), HttpStatus.OK);
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<CommonResponse> changePassword(@RequestBody ChangePasswordRequestDto dto) {
+        userService.changePassword(dto);
+        return new ResponseEntity<>(new CommonResponse(HttpStatus.OK, "Password changed!", null), HttpStatus.OK);
     }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class UserCreateRequestDto {
     private String userName;
-    private int userId;
+//    private int userId;
     private String email;
     private String password;
 }
