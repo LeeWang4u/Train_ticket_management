@@ -1,5 +1,6 @@
 package com.tauhoa.train.services;
 
+import com.tauhoa.train.dtos.response.TicketTypeCountResponseDTO;
 import com.tauhoa.train.models.TicketType;
 import com.tauhoa.train.repositories.TicketTypeRepository;
 import lombok.NonNull;
@@ -16,9 +17,11 @@ public class TicketTypeService implements ITicketTypeService {
     private TicketTypeRepository ticketTypeRepository;
 
 
-
     @NonNull
     public List<TicketType> getAllTicketTypes() {
         return ticketTypeRepository.findAll();
+    }
+    public List<TicketTypeCountResponseDTO> getTicketCountsGroupedByType() {
+        return ticketTypeRepository.countTicketsByTicketType();
     }
 }

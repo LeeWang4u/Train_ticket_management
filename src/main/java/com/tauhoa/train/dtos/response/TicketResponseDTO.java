@@ -3,15 +3,11 @@ package com.tauhoa.train.dtos.response;
 import com.tauhoa.train.models.Ticket;
 import lombok.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+ @Getter
+ @Builder
+ @Setter
 
-@Data
 @AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Builder
-@Setter
 public class TicketResponseDTO {
     private int ticketId;
     private int tripId;
@@ -20,6 +16,7 @@ public class TicketResponseDTO {
     private int seatId;
     private String trainName;
     private String routeName;
+
     public static TicketResponseDTO toTicketResponseDTO(Ticket ticket) {
         return TicketResponseDTO.builder()
                 .ticketId(ticket.getTicketId())

@@ -152,4 +152,21 @@ public class TripController {
             return ResponseEntity.status(500).body(ApiResponse.failure("Đã xảy ra lỗi: " + e.getMessage(), null));
         }
     }
+      
+    @GetMapping
+    public ResponseEntity<List<Trip>> getAllTrips() {
+        List<Trip> trips = tripService.getAllTrips();
+        if (trips.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(trips);
+    }
+
+    // Xem chi tiết một chuyến đi theo ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Trip> getTripById(@PathVariable int id) {
+        return tripService.getTripById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }
