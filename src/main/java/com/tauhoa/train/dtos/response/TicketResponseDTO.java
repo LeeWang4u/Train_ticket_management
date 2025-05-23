@@ -4,9 +4,9 @@ import com.tauhoa.train.models.Ticket;
 import lombok.*;
 
 
-// @Getter
-// @Builder
-// @Setter
+ @Getter
+ @Builder
+ @Setter
 @AllArgsConstructor
 public class TicketResponseDTO {
     private int ticketId;

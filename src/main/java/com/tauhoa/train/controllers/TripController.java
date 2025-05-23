@@ -151,6 +151,7 @@ public class TripController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body(ApiResponse.failure("Đã xảy ra lỗi: " + e.getMessage(), null));
         }
+    }
       
     @GetMapping
     public ResponseEntity<List<Trip>> getAllTrips() {

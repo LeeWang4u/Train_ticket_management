@@ -4,14 +4,15 @@ spring:
       name: user
       password: password
   redis:
-    host: localhost
+    host:  localhost
     port: 6379
     password:
   application:
     name: train
   datasource:
-#    url: jdbc:mysql://localhost:3306/db_train_ticket_system?useSSL=false&serverTimezone=UTC
+#    host.docker.internal
     url: jdbc:mysql://localhost:3306/train_ticket_system?useSSL=false&serverTimezone=UTC
+#    url: jdbc:mysql://host.docker.internal:3306/train_ticket_system?useSSL=false&serverTimezone=UTC
     username: root
     password: 123
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -41,3 +42,7 @@ jwt:
   expiration: 100
   refresh-expiration: 86400
   secretKey: "bXlfc3VwZXJfc2VjdXJlX3NlY3JldF9rZXlfZm9yX3RhdWhvYV8xMjM0NTY3ODkwIQ=="
+
+logging:
+  level:
+    root: warn
