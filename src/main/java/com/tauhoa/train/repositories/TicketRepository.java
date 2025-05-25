@@ -1,6 +1,7 @@
 package com.tauhoa.train.repositories;
 
-import com.tauhoa.train.dtos.response.MonthlySalesResonseDTO;
+import com.tauhoa.train.dtos.response.DailySalesResponseDTO;
+import com.tauhoa.train.dtos.response.MonthlySalesResponseDTO;
 import com.tauhoa.train.models.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -45,7 +46,24 @@ public interface TicketRepository extends JpaRepository<Ticket,Integer> {
     List<TicketCountResponseDTO> findTicketCountGroupedByStations();
 
     @Query("""
-    SELECT new com.tauhoa.train.dtos.response.MonthlySalesResonseDTO(
+    SELECT new com.tauhoa.train.dtos.response.DailySalesResponseDTO(
+        DATE(t.purchaseTime),
+        SUM(t.price)
+    )
+    FROM Ticket t
+    WHERE t.purchaseTime BETWEEN :startDate AND :endDate
+      AND t.ticketStatus = 'Booked'
+    GROUP BY DATE(t.purchaseTime)
+    ORDER BY DATE(t.purchaseTime)
+""")
+    List<DailySalesResponseDTO> getDailySalesByPurchaseTime(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
+
+
+    @Query("""
+    SELECT new com.tauhoa.train.dtos.response.MonthlySalesResponseDTO(
         YEAR(t.purchaseTime),
         MONTH(t.purchaseTime),
         SUM(t.price)
@@ -56,7 +74,7 @@ public interface TicketRepository extends JpaRepository<Ticket,Integer> {
     GROUP BY YEAR(t.purchaseTime), MONTH(t.purchaseTime)
     ORDER BY YEAR(t.purchaseTime), MONTH(t.purchaseTime)
 """)
-    List<MonthlySalesResonseDTO> getMonthlySalesByPurchaseTime(
+    List<MonthlySalesResponseDTO> getMonthlySalesByPurchaseTime(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );

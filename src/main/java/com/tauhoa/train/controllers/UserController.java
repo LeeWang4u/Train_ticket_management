@@ -95,7 +95,7 @@ public class UserController {
         return new ResponseEntity<>(new CommonResponse(HttpStatus.OK, "OTP sent!", null), HttpStatus.OK);
     }
 
-    @PostMapping("/changePassword")
+    @PostMapping("/change-password")
     public ResponseEntity<CommonResponse> changePassword(@RequestBody ChangePasswordRequestDto dto) {
         userService.changePassword(dto);
         return new ResponseEntity<>(new CommonResponse(HttpStatus.OK, "Password changed!", null), HttpStatus.OK);
