@@ -19,6 +19,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.List;

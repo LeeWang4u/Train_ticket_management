@@ -1,11 +1,11 @@
 package com.tauhoa.train.dtos.response;
 import java.math.BigDecimal;
 
-public class MonthlySalesResonseDTO {
+public class MonthlySalesResponseDTO {
     private String month;
     private BigDecimal total;
 
-    public MonthlySalesResonseDTO(Integer year, Integer month, BigDecimal total) {
+    public MonthlySalesResponseDTO(Integer year, Integer month, BigDecimal total) {
         this.month = String.format("%04d-%02d", year, month);
         this.total = total;
     }

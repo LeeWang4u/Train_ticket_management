@@ -4,8 +4,6 @@ import com.tauhoa.train.dtos.request.*;
 import com.tauhoa.train.dtos.response.*;
 
 import com.tauhoa.train.models.*;
-import com.tauhoa.train.repositories.TicketRepository;
-import com.tauhoa.train.repositories.TrainScheduleRepository;
 import com.tauhoa.train.services.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -199,7 +195,7 @@ public class TicketController {
         LocalDateTime endDateTime = end.atTime(23, 59, 59);
 
         if ("monthly".equalsIgnoreCase(type)) {
-            List<MonthlySalesResonseDTO> sales = ticketService.getMonthlySales(startDateTime, endDateTime);
+            List<MonthlySalesResponseDTO> sales = ticketService.getMonthlySales(startDateTime, endDateTime);
             return sales.isEmpty()
                     ? ResponseEntity.status(404).body("No monthly sales found.")
                     : ResponseEntity.ok(sales);
