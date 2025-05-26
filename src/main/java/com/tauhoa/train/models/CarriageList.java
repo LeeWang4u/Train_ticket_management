@@ -30,7 +30,7 @@ public class CarriageList {
     private Trip trip;
 
     @OneToMany(mappedBy = "carriageList", fetch = FetchType.LAZY)
-    @JsonManagedReference
+    //@JsonManagedReference
     private List<Seat> seats;
 
     @Column(name = "stt", nullable = false)
