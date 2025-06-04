@@ -1,6 +1,8 @@
 package com.tauhoa.train.models;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +32,7 @@ public class Seat {
 
     @ManyToOne
     @JoinColumn(name = "carriage_list_id", nullable = false)
+    @JsonIgnoreProperties("seats")
     private CarriageList carriageList;
 
     @Column(name = "seat_status", nullable = false)

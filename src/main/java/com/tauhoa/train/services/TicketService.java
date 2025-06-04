@@ -2,6 +2,8 @@ package com.tauhoa.train.services;
 
 import com.tauhoa.train.dtos.request.TicketRequestDTO;
 import com.tauhoa.train.dtos.request.TicketReservationReqDTO;
+import com.tauhoa.train.dtos.response.DailySalesResponseDTO;
+import com.tauhoa.train.dtos.response.MonthlySalesResponseDTO;
 import com.tauhoa.train.dtos.response.TicketCountResponseDTO;
 import com.tauhoa.train.dtos.response.TicketResponseDTO;
 import com.tauhoa.train.models.*;
@@ -10,6 +12,8 @@ import com.tauhoa.train.repositories.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +30,7 @@ public class TicketService implements ITicketService {
     private final TripService tripService;
     private final SeatService seatService;
     private final StationService stationService;
+    private final EmailService emailService;
 
 
     @Override
@@ -113,6 +118,21 @@ public class TicketService implements ITicketService {
     }
 
     @Override
+
+    public void cancelTicketByTrip(int tripId) {
+        List<Ticket> tickets = ticketRepository.findByTripIdAndStatusBookedOrHold(tripId);
+        for (Ticket ticket : tickets) {
+            if (ticket.getTicketStatus().equals("Booked")) {
+                ticket.setTicketStatus("Canceled");
+                ticketRepository.save(ticket);
+                emailService.sendEmailCancelTicket(ticket);
+            } else {
+                ticketRepository.delete(ticket);
+            }
+
+        }
+    }
+
     public List<TicketResponseDTO> getTicketsBetween(LocalDateTime start, LocalDateTime end) {
         List<Ticket> tickets = ticketRepository.findTicketsByDateRange(start, end);
         return tickets.stream()
@@ -125,4 +145,17 @@ public class TicketService implements ITicketService {
         return ticketRepository.findTicketCountGroupedByStations();
     }
 
+    @Override
+    public List<MonthlySalesResponseDTO> getMonthlySales(LocalDateTime from, LocalDateTime to) {
+        return ticketRepository.getMonthlySalesByPurchaseTime(from, to);
+    }
+
+    @Override
+    public List<DailySalesResponseDTO> getDailySales(LocalDateTime from, LocalDateTime to) {
+        return ticketRepository.getDailySalesByPurchaseTime(from, to);
+    }
+
+    public BigDecimal getTotalRevenue() {
+        return ticketRepository.getTotalPriceSum();
+    }
 }

@@ -1,12 +1,9 @@
 package com.tauhoa.train.controllers;
 
 import com.tauhoa.train.dtos.request.*;
-import com.tauhoa.train.dtos.response.BookingResponse;
-import com.tauhoa.train.dtos.response.TicketCountResponseDTO;
-import com.tauhoa.train.dtos.response.TicketResponseDTO;
+import com.tauhoa.train.dtos.response.*;
+
 import com.tauhoa.train.models.*;
-import com.tauhoa.train.repositories.TicketRepository;
-import com.tauhoa.train.repositories.TrainScheduleRepository;
 import com.tauhoa.train.services.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -147,13 +143,70 @@ public class TicketController {
         }
     }
 
+    @GetMapping("/searchTicketByIdAndroid")
+    public ResponseEntity<?> searchTicketByIdAndroid(@RequestParam int ticketId) {
+        try {
+            System.out.println(ticketId);
+            Ticket ticket = ticketService.findByTicketId(ticketId);
+            SearchTicketResponse searchTicketResponse = new SearchTicketResponse(ticket.getTicketId(),
+                    ticket.getPassenger().getFullname(),
+                    ticket.getDepartureStation().getStationName(),
+                    ticket.getArrivalStation().getStationName(),
+                    ticket.getSeat().getSeatNumber(),
+                    ticket.getTrip().getTrain().getTrainName());
+            return ResponseEntity.ok(searchTicketResponse);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Không tìm thấy vé với ID: " + ticketId);
+        }
+    }
+
+    @GetMapping("/searchTicketByReservationCodeAndroid")
+    public ResponseEntity<?> searchTicketByReservationCodeAndroid(@RequestParam int reservationCode) {
+        try {
+            List<Ticket> tickets = ticketService.findByReservationCode(reservationCode);
+            List<SearchTicketResponse> ticketResponseDTOList = new ArrayList<>();
+            for (Ticket ticket : tickets) {
+                SearchTicketResponse searchTicketResponse = new SearchTicketResponse(ticket.getTicketId(),
+                        ticket.getPassenger().getFullname(),
+                        ticket.getDepartureStation().getStationName(),
+                        ticket.getArrivalStation().getStationName(),
+                        ticket.getSeat().getSeatNumber(),
+                        ticket.getTrip().getTrain().getTrainName());
+                ticketResponseDTOList.add(searchTicketResponse);
+            }
+            if (tickets.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(ticketResponseDTOList);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Không tìm thấy vé với mã đặt vé: " + reservationCode);
+        }
+    }
+
     @PostMapping("/from-to")
     public ResponseEntity<?> getTicketsFromTo(@Valid @RequestBody TicketDateRangeRequestDTO request) {
         LocalDate start = LocalDate.parse(request.getStartDate());
         LocalDate end = LocalDate.parse(request.getEndDate());
+        String type = request.getType();
 
         LocalDateTime startDateTime = start.atStartOfDay();
         LocalDateTime endDateTime = end.atTime(23, 59, 59);
+
+        if ("monthly".equalsIgnoreCase(type)) {
+            List<MonthlySalesResponseDTO> sales = ticketService.getMonthlySales(startDateTime, endDateTime);
+            return sales.isEmpty()
+                    ? ResponseEntity.status(404).body("No monthly sales found.")
+                    : ResponseEntity.ok(sales);
+        }
+
+        if ("daily".equalsIgnoreCase(type)) {
+            List<DailySalesResponseDTO> dailySales = ticketService.getDailySales(startDateTime, endDateTime);
+            return dailySales.isEmpty()
+                    ? ResponseEntity.status(404).body("No daily sales found.")
+                    : ResponseEntity.ok(dailySales);
+        }
 
         List<TicketResponseDTO> tickets = ticketService.getTicketsBetween(startDateTime, endDateTime);
 
@@ -166,5 +219,10 @@ public class TicketController {
     public ResponseEntity<List<TicketCountResponseDTO>> getTicketSummary() {
         List<TicketCountResponseDTO> ticketSummary = ticketService.getTicketCountGroupedByStations();
         return ResponseEntity.ok(ticketSummary);
+    }
+
+    @GetMapping("/total-revenue")
+    public ResponseEntity<BigDecimal> getTotalRevenue() {
+        return ResponseEntity.ok(ticketService.getTotalRevenue());
     }
 }

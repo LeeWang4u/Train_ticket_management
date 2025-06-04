@@ -1,5 +1,6 @@
 package com.tauhoa.train.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +32,7 @@ public class Customer {
     private String fullname;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL,  fetch = FetchType.LAZY)
+    @JsonIgnore
     private List <Ticket> tickets;
 
 //    public Customer(){}

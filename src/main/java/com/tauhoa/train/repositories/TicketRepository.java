@@ -1,11 +1,14 @@
 package com.tauhoa.train.repositories;
 
+import com.tauhoa.train.dtos.response.DailySalesResponseDTO;
+import com.tauhoa.train.dtos.response.MonthlySalesResponseDTO;
 import com.tauhoa.train.models.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,4 +44,42 @@ public interface TicketRepository extends JpaRepository<Ticket,Integer> {
             "WHERE t.ticketStatus = 'Booked' " +
             "GROUP BY t.departureStation.stationName, t.arrivalStation.stationName")
     List<TicketCountResponseDTO> findTicketCountGroupedByStations();
+
+    @Query("""
+    SELECT new com.tauhoa.train.dtos.response.DailySalesResponseDTO(
+        DATE(t.purchaseTime),
+        SUM(t.price)
+    )
+    FROM Ticket t
+    WHERE t.purchaseTime BETWEEN :startDate AND :endDate
+      AND t.ticketStatus = 'Booked'
+    GROUP BY DATE(t.purchaseTime)
+    ORDER BY DATE(t.purchaseTime)
+""")
+    List<DailySalesResponseDTO> getDailySalesByPurchaseTime(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
+
+
+    @Query("""
+    SELECT new com.tauhoa.train.dtos.response.MonthlySalesResponseDTO(
+        YEAR(t.purchaseTime),
+        MONTH(t.purchaseTime),
+        SUM(t.price)
+    )
+    FROM Ticket t
+    WHERE t.purchaseTime BETWEEN :startDate AND :endDate
+      AND t.ticketStatus = 'Booked'
+    GROUP BY YEAR(t.purchaseTime), MONTH(t.purchaseTime)
+    ORDER BY YEAR(t.purchaseTime), MONTH(t.purchaseTime)
+""")
+    List<MonthlySalesResponseDTO> getMonthlySalesByPurchaseTime(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
+
+    @Query("SELECT SUM(t.totalPrice) FROM Ticket t")
+    BigDecimal getTotalPriceSum();
+
 }

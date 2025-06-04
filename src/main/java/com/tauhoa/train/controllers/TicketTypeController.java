@@ -1,5 +1,6 @@
 package com.tauhoa.train.controllers;
 
+import com.tauhoa.train.dtos.response.TicketTypeCountResponseDTO;
 import com.tauhoa.train.models.TicketType;
 import com.tauhoa.train.services.TicketTypeService;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +25,11 @@ public class TicketTypeController {
         } catch (Exception e){
             return ResponseEntity.status(500).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/count-by-type")
+    public ResponseEntity<List<TicketTypeCountResponseDTO>> getTicketCountsByType() {
+        List<TicketTypeCountResponseDTO> counts = ticketTypeService.getTicketCountsGroupedByType();
+        return ResponseEntity.ok(counts);
     }
 }

@@ -19,4 +19,7 @@ public interface ITripService {
 //    List<TripResponseDTO> findTrips(String departureStation, String arrivalStation, LocalDate tripDate);
     Trip addTrip(AddTripRequestDTO request);
     List<TripResponseDTO> findTripsByStationsAndDate(TripSearchRequestDTO request);
+
+    void cancelTrip(int tripId);
+
 }

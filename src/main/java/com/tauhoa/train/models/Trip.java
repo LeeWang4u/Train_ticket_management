@@ -1,4 +1,5 @@
 package com.tauhoa.train.models;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +8,9 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "trip")
@@ -23,6 +26,10 @@ public class Trip {
     @ManyToOne
     @JoinColumn(name = "train_id", nullable = false)
     private Train train;
+
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<CarriageList> carriageLists = new ArrayList<>();
 
     @Column(name = "base_price", nullable = false)
     private BigDecimal basePrice;

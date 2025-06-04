@@ -2,6 +2,7 @@ package com.tauhoa.train.controllers;
 
 import com.tauhoa.train.common.ApiResponse;
 import com.tauhoa.train.dtos.request.AddTripRequestDTO;
+import com.tauhoa.train.dtos.response.BookingResponse;
 import com.tauhoa.train.dtos.response.ErrorResponse;
 import com.tauhoa.train.dtos.response.TripResponseDTO;
 import com.tauhoa.train.dtos.request.TripSearchRequestDTO;
@@ -9,6 +10,7 @@ import com.tauhoa.train.models.Train;
 import com.tauhoa.train.models.Trip;
 import com.tauhoa.train.repositories.TrainRepository;
 import com.tauhoa.train.repositories.TripRepository;
+import com.tauhoa.train.services.TicketService;
 import com.tauhoa.train.services.TripService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,7 @@ public class TripController {
     private final TripService tripService;
     private final TripRepository tripRepository;
     private final TrainRepository trainRepository;
+    private final TicketService ticketService;
 
     @GetMapping("/ketqua")
     public ResponseEntity<?> getTripByDate(@PathVariable
@@ -136,8 +139,34 @@ public class TripController {
         return tripService.getTripRepository();
     }
 
+    @GetMapping("/cancelTrip")
+    public ResponseEntity<?> cancelTrip(@RequestParam int tripId) {
+        try {
+            tripService.cancelTrip(tripId);
+            ticketService.cancelTicketByTrip(tripId);
+            BookingResponse response = new BookingResponse();
+            response.setStatus("success");
+            response.setMessage("Hủy giữ vé thành công!");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(ApiResponse.failure("Đã xảy ra lỗi: " + e.getMessage(), null));
+        }
+    }
+      
+    @GetMapping
+    public ResponseEntity<List<Trip>> getAllTrips() {
+        List<Trip> trips = tripService.getAllTrips();
+        if (trips.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(trips);
+    }
 
-
-
-
+    // Xem chi tiết một chuyến đi theo ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Trip> getTripById(@PathVariable int id) {
+        return tripService.getTripById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }
