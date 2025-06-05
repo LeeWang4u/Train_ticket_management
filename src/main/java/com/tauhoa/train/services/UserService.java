@@ -69,7 +69,7 @@ public class UserService {
             throw new IllegalArgumentException("Invalid or expired OTP.");
         }
 
-        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Wrong password!");
         }
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));

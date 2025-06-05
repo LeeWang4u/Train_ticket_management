@@ -1,22 +1,23 @@
 package com.tauhoa.train.dtos.response;
 
+import lombok.Getter;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Date;
 
 public class DailySalesResponseDTO {
-    private LocalDate date;
-    private BigDecimal totalAmount;
+    @Getter
+    private Date date;
+    private BigDecimal totalSales;
 
-    public DailySalesResponseDTO(LocalDate date, BigDecimal totalAmount) {
+    public DailySalesResponseDTO(Date date, BigDecimal totalSales) {
         this.date = date;
-        this.totalAmount = totalAmount;
-    }
-    public LocalDate getDate() {
-        return date;
+        this.totalSales = totalSales;
     }
 
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
+    public BigDecimal getTotalSales() {
+        return totalSales;
     }
 }
 
