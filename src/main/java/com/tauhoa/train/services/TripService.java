@@ -113,8 +113,9 @@ public class TripService implements ITripService {
         int departureStationId = departureStationEntity.getStationId();
         int arrivalStationId = arrivalStationEntity.getStationId();
 
-        // Lấy tất cả các chuyến tàu
-        List<Trip> allTrips = tripRepository.findAll();
+        // Lấy tất cả các chuyến tàu findAllWithStatus
+//        List<Trip> allTrips = tripRepository.findAll();
+        List<Trip> allTrips = tripRepository.findAllWithStatus();
 
         // Lọc các chuyến tàu phù hợp
         return allTrips.stream()
