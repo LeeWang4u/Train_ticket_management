@@ -139,8 +139,8 @@ public class TripController {
         return tripService.getTripRepository();
     }
 
-    @GetMapping("/cancelTrip")
-    public ResponseEntity<?> cancelTrip(@RequestParam int tripId) {
+    @GetMapping("/cancelTrip/{tripId}")
+    public ResponseEntity<?> cancelTrip(@PathVariable("tripId") int tripId) {
         try {
             tripService.cancelTrip(tripId);
             ticketService.cancelTicketByTrip(tripId);

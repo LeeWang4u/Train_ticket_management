@@ -15,6 +15,8 @@ import java.util.List;
 public interface TripRepository extends JpaRepository<Trip, Integer> {
 //    @Override
 //    List<Trip> findAll();
+    @Query("SELECT t FROM Trip t WHERE t.tripStatus = 'Scheduled'")
+    List<Trip> findAllWithStatus();
 
     List<Trip> findAllByTripId(int tripId);
 
@@ -26,6 +28,11 @@ public interface TripRepository extends JpaRepository<Trip, Integer> {
     List<Trip> findByTrainIdAndTripDate(@Param("trainId") int trainId, @Param("tripDate") LocalDate tripDate);
 
     List<Trip> findByTrainAndTripDate(Train train, LocalDate tripDate);
+//    @Query("SELECT t FROM Trip t WHERE t.train = :train AND t.tripDate = :tripDate AND t.tripStatus = 'Scheduled'")
+//    List<Trip> findByTrainAndTripDate(@Param("train") Train train, @Param("tripDate") LocalDate tripDate);
+//
+
+
 //    @Query("SELECT t FROM Trip t " +
 //            "WHERE t.train.trainId IN (" +
 //            "    SELECT ts1.train.trainId " +
