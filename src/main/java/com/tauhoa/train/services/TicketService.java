@@ -32,7 +32,9 @@ public class TicketService implements ITicketService {
     private final StationService stationService;
     private final EmailService emailService;
 
-
+    public List<Ticket> getAllTickets() {
+        return ticketRepository.findAll();
+    }
     @Override
     public void save(TicketRequestDTO ticketDTO, Customer customer, Passenger passenger, ReservationCode reservationCode) {
         Ticket ticket = ticketRepository.findByTicketId(ticketDTO.getTicketId());
