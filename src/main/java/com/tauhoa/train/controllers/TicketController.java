@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -30,7 +31,19 @@ public class TicketController {
 //    private final TicketRepository ticketRepository;
 //    private final TrainScheduleRepository trainScheduleRepository;
 //    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+@GetMapping
+public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
+    List<Ticket> tickets = ticketService.getAllTickets();
+    List<TicketResponseDTO> ticketDTOs = tickets.stream()
+            .map(TicketResponseDTO::toTicketResponseDTO)
+            .collect(Collectors.toList());
 
+    if (ticketDTOs.isEmpty()) {
+        return ResponseEntity.noContent().build();
+    }
+
+    return ResponseEntity.ok(ticketDTOs);
+}
     @PostMapping("/confirmTicket")
     public ResponseEntity<?> bookTicket(@RequestBody @Valid ReservationCodeRequestDTO request) {
         try {

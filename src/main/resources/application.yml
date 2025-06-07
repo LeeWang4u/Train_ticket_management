@@ -14,10 +14,17 @@ spring:
 
 #    host.docker.internal
 #    url: jdbc:mysql://localhost:3306/db_train_ticket_system?useSSL=false&serverTimezone=UTC
-    url: jdbc:mysql://localhost:3306/train_ticket_system?useSSL=false&serverTimezone=UTC
-#    url: jdbc:mysql://host.docker.internal:3306/train_ticket_system?useSSL=false&serverTimezone=UTC
-    username: root
-    password:
+#    url: jdbc:mysql://localhost:3306/train_ticket_system?useSSL=false&serverTimezone=UTC
+# =======
+
+# #    host.docker.internal
+# #    url: jdbc:mysql://localhost:3306/db_train_ticket_system?useSSL=false&serverTimezone=UTC
+#     url: jdbc:mysql://localhost:3306/train_ticket_system?useSSL=false&serverTimezone=UTC
+# #    url: jdbc:mysql://host.docker.internal:3306/train_ticket_system?useSSL=false&serverTimezone=UTC
+# >>>>>>> main
+    url: jdbc:mysql://10.242.1.194:3306/train_ticket_system?useSSL=false&serverTimezone=UTC
+    username: hoang
+    password: 123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -42,7 +49,7 @@ spring:
             enable: true
 
 jwt:
-  expiration: 100
+  expiration: 10000
   refresh-expiration: 86400
   secretKey: "bXlfc3VwZXJfc2VjdXJlX3NlY3JldF9rZXlfZm9yX3RhdWhvYV8xMjM0NTY3ODkwIQ=="
 
