@@ -28,4 +28,5 @@ public interface ITicketService {
     List<MonthlySalesResponseDTO> getMonthlySales(LocalDateTime from, LocalDateTime to);
     List<DailySalesResponseDTO> getDailySales (LocalDateTime from, LocalDateTime to);
     public BigDecimal getTotalRevenue();
+    boolean validateTicketReservation(TicketReservationReqDTO ticketReservationReqDTO);
 }
