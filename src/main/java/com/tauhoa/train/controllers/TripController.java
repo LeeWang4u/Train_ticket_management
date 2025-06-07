@@ -25,7 +25,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/trips")
+    @RequestMapping("/api/trips")
 public class TripController {
     //@Autowired
     private final TripService tripService;
@@ -139,11 +139,11 @@ public class TripController {
         return tripService.getTripRepository();
     }
 
-    @GetMapping("/cancelTrip")
-    public ResponseEntity<?> cancelTrip(@RequestParam int tripId) {
+    @GetMapping("/cancelTrip/{id}")
+    public ResponseEntity<?> cancelTrip(@PathVariable("id") int id) {
         try {
-            tripService.cancelTrip(tripId);
-            ticketService.cancelTicketByTrip(tripId);
+            tripService.cancelTrip(id);
+            ticketService.cancelTicketByTrip(id);
             BookingResponse response = new BookingResponse();
             response.setStatus("success");
             response.setMessage("Hủy giữ vé thành công!");

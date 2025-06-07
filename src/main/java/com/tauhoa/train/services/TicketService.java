@@ -155,6 +155,28 @@ public class TicketService implements ITicketService {
         return ticketRepository.getDailySalesByPurchaseTime(from, to);
     }
 
+    public boolean validateTicketReservation(TicketReservationReqDTO ticketReservationReqDTO){
+        Optional<Ticket> ticket = ticketRepository.findByTripIdAndSeatId(ticketReservationReqDTO.getTrip(), ticketReservationReqDTO.getSeat());
+        if(ticket.isEmpty()){
+
+            return false;
+        }else{
+
+            Optional<Station> departureStation = stationService.findByStationName(ticketReservationReqDTO.getDepartureStation());
+            Optional<Station> arrivalStation = stationService.findByStationName(ticketReservationReqDTO.getArrivalStation());
+            if(departureStation.get().getStationId()>= ticket.get().getArrivalStation().getStationId()){
+
+                return false;
+            } else if(arrivalStation.get().getStationId() <= ticket.get().getDepartureStation().getStationId()){
+
+                return false;
+            } else {
+
+                return true;
+            }
+        }
+    }
+
     public BigDecimal getTotalRevenue() {
         return ticketRepository.getTotalPriceSum();
     }
