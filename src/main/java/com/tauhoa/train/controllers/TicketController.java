@@ -45,7 +45,7 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
     return ResponseEntity.ok(ticketDTOs);
 }
 
-    @GetMapping("/findByTripId/{tripId}")
+    @GetMapping("/trip/{tripId}")
     public ResponseEntity<List<Ticket>> getTicketsByTripId(@PathVariable int tripId) {
         List<Ticket> tickets = ticketService.findAllByTripId(tripId);
         if (tickets.isEmpty()) {
