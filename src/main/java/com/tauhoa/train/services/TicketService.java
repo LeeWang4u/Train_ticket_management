@@ -98,7 +98,7 @@ public class TicketService implements ITicketService {
 
     public List<Ticket> findAllByTripId(int TripId){
         if (TripId <= 0) return Collections.emptyList();
-        return ticketRepository.findAllByTripId(TripId);
+        return ticketRepository.findAllByTrip_TripId(TripId);
     }
     @Override
     public List<Ticket> findByCustomer(String cccd, String phone) {
