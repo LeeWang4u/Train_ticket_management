@@ -102,6 +102,10 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
     @PostMapping("/reserve")
     public ResponseEntity<?> reserveTicket(@RequestBody @Valid TicketReservationReqDTO ticketReservationDTO){
         try{
+            boolean isValid = ticketService.validateTicketReservation(ticketReservationDTO);
+            if(isValid){
+                return ResponseEntity.status(400).body("Vé đã được giữ trước đó.");
+            }
             TicketResponseDTO ticket = ticketService.saveReservation(ticketReservationDTO);
             return ResponseEntity.status(200).body(ticket);
         } catch (Exception e){
