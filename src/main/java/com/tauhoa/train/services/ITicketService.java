@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ITicketService {
+    List<Ticket> getAllTickets() ;
     void save(TicketRequestDTO ticketDTO, Customer customer, Passenger passenger , ReservationCode reservationCode);
     TicketResponseDTO saveReservation(TicketReservationReqDTO ticketDTO);
     void deleteTicket(TicketReservationReqDTO ticketReservationReqDTO);
