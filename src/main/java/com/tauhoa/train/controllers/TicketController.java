@@ -44,6 +44,16 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
 
     return ResponseEntity.ok(ticketDTOs);
 }
+
+    @GetMapping("/findByTripId/{tripId}")
+    public ResponseEntity<List<Ticket>> getTicketsByTripId(@PathVariable int tripId) {
+        List<Ticket> tickets = ticketService.findAllByTripId(tripId);
+        if (tickets.isEmpty()) {
+            return ResponseEntity.noContent().build(); // or notFound()
+        }
+        return ResponseEntity.ok(tickets);
+    }
+
     @PostMapping("/confirmTicket")
     public ResponseEntity<?> bookTicket(@RequestBody @Valid ReservationCodeRequestDTO request) {
         try {
