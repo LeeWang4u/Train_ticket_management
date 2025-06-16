@@ -9,5 +9,5 @@ import org.springframework.http.HttpStatus;
 public class CommonResponse {
     private HttpStatus status;
     private String message;
-    private Object result;
+    private Object data;
 }
