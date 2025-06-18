@@ -28,6 +28,18 @@ public interface TripRepository extends JpaRepository<Trip, Integer> {
     List<Trip> findByTrainIdAndTripDate(@Param("trainId") int trainId, @Param("tripDate") LocalDate tripDate);
 
     List<Trip> findByTrainAndTripDate(Train train, LocalDate tripDate);
+
+
+    @Query("SELECT t FROM Trip t WHERE " +
+            "(:train IS NULL OR t.train = :train) AND " +
+            "(:fromDate IS NULL OR t.tripDate >= :fromDate) AND " +
+            "(:toDate IS NULL OR t.tripDate <= :toDate)")
+    List<Trip> searchTrips(
+            @Param("train") Train train,
+            @Param("fromDate") LocalDate fromDate,
+            @Param("toDate") LocalDate toDate
+    );
+
 //    @Query("SELECT t FROM Trip t WHERE t.train = :train AND t.tripDate = :tripDate AND t.tripStatus = 'Scheduled'")
 //    List<Trip> findByTrainAndTripDate(@Param("train") Train train, @Param("tripDate") LocalDate tripDate);
 //

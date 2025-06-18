@@ -91,8 +91,16 @@ public class CarriageListController {
     @PostMapping("/seats")
     public ResponseEntity<?> getTripWithCarriagesAndSeatsAvailabilityByNameStation(
             @RequestBody TripSeatRequestDTO request) {
-        if (request.getTripId() <= 0 || request.getDepartureStation() == null || request.getArrivalStation() == null) {
-            return ResponseEntity.badRequest().body("Invalid parameters: all IDs must be greater than 0");
+//        if (request.getTripId() <= 0 || request.getDepartureStation() == null || request.getArrivalStation() == null
+//        || request.getDepartureStation().isBlank() || request.getArrivalStation().isBlank()) {
+//            return ResponseEntity.badRequest().body("Invalid parameters: all IDs must be greater than 0");
+//        }
+
+        if (request.getTripId() <= 0 ||
+                request.getDepartureStation() == null || request.getArrivalStation() == null ||
+                request.getDepartureStation().isBlank() || request.getArrivalStation().isBlank()) {
+
+            return ResponseEntity.badRequest().body("Invalid parameters: station names cannot be empty");
         }
 
         try {
