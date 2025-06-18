@@ -22,6 +22,10 @@ public class CarriageResponseDTO {
         this.seats = seats;
     }
 
+    public CarriageResponseDTO() {
+        // Constructor rỗng để Jackson có thể khởi tạo đối tượng
+    }
+
     // Getter và Setter
     public int getCarriageListId() {
         return carriageListId;

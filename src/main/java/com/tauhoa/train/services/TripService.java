@@ -29,6 +29,7 @@ public class TripService implements ITripService {
     private final TrainRepository trainRepository;
     private final CompartmentRepository compartmentRepository;
     private final TicketRepository ticketRepository;
+    private final SeatService seatService;
     @Override
     public Optional<Trip> getTrip(int id) {
         return tripRepository.findById(id);
@@ -162,7 +163,8 @@ public class TripService implements ITripService {
                         return null;
                     }
 
-                    int availableSeats = getNumberEmptySeats(trip.getTripId(), departureStationName, arrivalStationName);
+//                    int availableSeats = getNumberEmptySeats(trip.getTripId(), departureStationName, arrivalStationName);
+                    int availableSeats = seatService.getNumberEmptySeats(trip.getTripId(), departureStationName, arrivalStationName);
                     // Tạo DTO phản hồi
                     return new TripResponseDTO(
                             trip.getTripId(),
@@ -441,5 +443,12 @@ public class TripService implements ITripService {
     public Optional<Trip> getTripById(int id) {
         return tripRepository.findById(id);
     }
+
+
+    public List<Trip> findTrips(Train train, LocalDate fromDate, LocalDate toDate) {
+        return tripRepository.searchTrips(train, fromDate, toDate);
+    }
+
+
 
 }

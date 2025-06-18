@@ -9,4 +9,6 @@ public interface ISeatService {
     Optional<Seat> getSeat(int id);
 
     List<Seat> findAllSeatByIdTrip(int idTrip);
+
+    int getNumberEmptySeats(int tripId, String departureStationName, String arrivalStationName );
 }

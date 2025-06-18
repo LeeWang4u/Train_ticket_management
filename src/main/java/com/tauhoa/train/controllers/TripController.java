@@ -6,8 +6,10 @@ import com.tauhoa.train.dtos.response.BookingResponse;
 import com.tauhoa.train.dtos.response.ErrorResponse;
 import com.tauhoa.train.dtos.response.TripResponseDTO;
 import com.tauhoa.train.dtos.request.TripSearchRequestDTO;
+import com.tauhoa.train.models.Station;
 import com.tauhoa.train.models.Train;
 import com.tauhoa.train.models.Trip;
+import com.tauhoa.train.repositories.StationRepository;
 import com.tauhoa.train.repositories.TrainRepository;
 import com.tauhoa.train.repositories.TripRepository;
 import com.tauhoa.train.services.TicketService;
@@ -32,6 +34,7 @@ public class TripController {
     private final TripRepository tripRepository;
     private final TrainRepository trainRepository;
     private final TicketService ticketService;
+    private final StationRepository stationRepository;
 
     @GetMapping("/ketqua")
     public ResponseEntity<?> getTripByDate(@PathVariable
@@ -84,7 +87,21 @@ public class TripController {
             return ResponseEntity.badRequest().body("Invalid parameters: departureStation, arrivalStation, and tripDate are required");
         }
 
+        if(request.getDepartureStation().equals(request.getArrivalStation())) {
+            return ResponseEntity.badRequest().body("Departure and arrival stations cannot be the same");
+        }
+
+        if(request.getTripDate().isBefore(LocalDate.now())) {
+            return ResponseEntity.badRequest().body("Trip date cannot be in the past");
+        }
+
         try {
+            Station departureStation = stationRepository.findByStationName(request.getDepartureStation())
+                    .orElseThrow(() -> new IllegalArgumentException("Departure station not found: " + request.getDepartureStation()));
+
+            Station arrivalStation = stationRepository.findByStationName(request.getArrivalStation())
+                    .orElseThrow(() -> new IllegalArgumentException("Arrival station not found: " + request.getArrivalStation()));
+
             List<TripResponseDTO> trips = tripService.findTripsByStationsAndDate(request);
             if (trips.isEmpty()) {
                 return ResponseEntity.status(500).body("No trips found for the given stations and date");
@@ -159,6 +176,20 @@ public class TripController {
         if (trips.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+        return ResponseEntity.ok(trips);
+    }
+
+    @GetMapping("/trip")
+    public ResponseEntity<List<Trip>> searchTrips(
+            @RequestParam(required = false) Integer trainId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate
+    ) {
+        Train train = null;
+        if (trainId != null) {
+            train = trainRepository.findById(trainId).orElse(null);
+        }
+        List<Trip> trips = tripService.findTrips(train, fromDate, toDate);
         return ResponseEntity.ok(trips);
     }
 

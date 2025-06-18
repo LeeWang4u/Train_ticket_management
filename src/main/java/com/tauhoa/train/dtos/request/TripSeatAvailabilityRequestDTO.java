@@ -5,6 +5,16 @@ public class TripSeatAvailabilityRequestDTO {
     private int departureStationId;
     private int arrivalStationId;
 
+    public TripSeatAvailabilityRequestDTO(int tripId, int departureStationId, int arrivalStationId) {
+        this.tripId = tripId;
+        this.departureStationId = departureStationId;
+        this.arrivalStationId = arrivalStationId;
+    }
+
+    public TripSeatAvailabilityRequestDTO() {
+        // Constructor rỗng để Jackson có thể khởi tạo đối tượng
+    }
+
     // Getter và Setter
     public int getTripId() {
         return tripId;

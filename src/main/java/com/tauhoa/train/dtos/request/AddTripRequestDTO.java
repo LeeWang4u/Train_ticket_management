@@ -12,6 +12,19 @@ public class AddTripRequestDTO {
     private int numSixBerthCarriages;
     private int numFourBerthCarriages;
 
+    public AddTripRequestDTO(int trainId, BigDecimal basePrice, LocalDate tripDate, int numSoftSeatCarriages, int numSixBerthCarriages, int numFourBerthCarriages) {
+        this.trainId = trainId;
+        this.basePrice = basePrice;
+        this.tripDate = tripDate;
+        this.numSoftSeatCarriages = numSoftSeatCarriages;
+        this.numSixBerthCarriages = numSixBerthCarriages;
+        this.numFourBerthCarriages = numFourBerthCarriages;
+    }
+
+    public AddTripRequestDTO() {
+        // Constructor mặc định
+    }
+
     // Getter và Setter
     public int getTrainId() {
         return trainId;

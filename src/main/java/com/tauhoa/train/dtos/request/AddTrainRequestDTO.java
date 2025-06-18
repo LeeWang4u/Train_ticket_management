@@ -9,4 +9,6 @@ public class AddTrainRequestDTO {
     private String trainName;
     private String route;
 
+
+
 }

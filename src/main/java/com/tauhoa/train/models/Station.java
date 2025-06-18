@@ -26,6 +26,12 @@ public class Station {
         this.location = location;
     }
 
+//    public Station(int id,String stationName, String location) {
+//        this.stationId = id;
+//        this.stationName = stationName;
+//        this.location = location;
+//    }
+
     public int getStationId() {
         return stationId;
     }
