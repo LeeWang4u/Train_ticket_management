@@ -36,6 +36,12 @@ public class Train {
         this.route = route;
     }
 
+    public Train(int i, String se1, Route route) {
+        this.trainId = i;
+        this.trainName = se1;
+        this.route = route;
+    }
+
     public int getTrainId() {
         return trainId;
     }
