@@ -96,6 +96,10 @@ public class TicketService implements ITicketService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy vé với ID: " + ticketId));
     }
 
+    public List<Ticket> findAllByTripId(int TripId){
+        if (TripId <= 0) return Collections.emptyList();
+        return ticketRepository.findAllByTrip_TripId(TripId);
+    }
     @Override
     public List<Ticket> findByCustomer(String cccd, String phone) {
         if (cccd == null || cccd.isEmpty() || phone == null || phone.isEmpty()) {
@@ -120,7 +124,6 @@ public class TicketService implements ITicketService {
     }
 
     @Override
-
     public void cancelTicketByTrip(int tripId) {
         List<Ticket> tickets = ticketRepository.findByTripIdAndStatusBookedOrHold(tripId);
         for (Ticket ticket : tickets) {
