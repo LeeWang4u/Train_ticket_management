@@ -15,10 +15,10 @@ public class TicketReservationReqDTO {
 
 
         @NotNull(message = "Thông tin ghế không được để trống")
-        private int seat;
+        private Integer  seat;
 
         @NotNull(message = "Thông tin chuyến đi không được để trống")
-        private int trip;
+        private Integer  trip;
 
         @NotNull(message = "Ga đến không được để trống")
         private String arrivalStation;

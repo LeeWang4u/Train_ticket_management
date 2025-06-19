@@ -38,7 +38,7 @@ public class TrainSearchResultTest {
         driver = new ChromeDriver(options);
         driver.manage().window().maximize();
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        driver.get("your_website_url"); // Thay bằng URL thực tế
+        driver.get("http://localhost:5173"); // Thay bằng URL thực tế
     }
 
     @AfterClass

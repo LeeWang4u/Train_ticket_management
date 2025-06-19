@@ -1,4 +1,5 @@
 package com.tauhoa.train.models;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,35 +18,36 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Trip {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "trip_id")
-    private int tripId;
+    public class Trip {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "trip_id")
+        private int tripId;
 
-    @ManyToOne
-    @JoinColumn(name = "train_id", nullable = false)
-    private Train train;
+        @ManyToOne
+        @JoinColumn(name = "train_id", nullable = false)
+        private Train train;
 
-    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private List<CarriageList> carriageLists = new ArrayList<>();
+        @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+        @JsonManagedReference
+        private List<CarriageList> carriageLists = new ArrayList<>();
 
-    @Column(name = "base_price", nullable = false)
-    private BigDecimal basePrice;
+        @Column(name = "base_price", nullable = false)
+        private BigDecimal basePrice;
 
-    @Column(name = "trip_date", nullable = false)
-    private LocalDate tripDate;
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        @Column(name = "trip_date", nullable = false)
+        private LocalDate tripDate;
 
-    @Column(name = "trip_status", nullable = false)
-    private String tripStatus;
+        @Column(name = "trip_status", nullable = false)
+        private String tripStatus;
 
-    public Trip(Train train, BigDecimal basePrice, LocalDate tripDate, String tripStatus) {
-        this.train = train;
-        this.basePrice = basePrice;
-        this.tripDate = tripDate;
-        this.tripStatus = tripStatus;
-    }
+        public Trip(Train train, BigDecimal basePrice, LocalDate tripDate, String tripStatus) {
+            this.train = train;
+            this.basePrice = basePrice;
+            this.tripDate = tripDate;
+            this.tripStatus = tripStatus;
+        }
 
     public int getTripId() {
         return tripId;

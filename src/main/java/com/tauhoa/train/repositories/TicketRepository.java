@@ -34,7 +34,6 @@ public interface TicketRepository extends JpaRepository<Ticket,Integer> {
             Station arrivalStation
     );
 
-
     List<Ticket> findBySeatSeatId(int seatId);
 
     List<Ticket> findByReservationCodeReservationCodeId(int reservationCodeId);
