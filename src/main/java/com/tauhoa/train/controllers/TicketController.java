@@ -57,14 +57,42 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
     @PostMapping("/confirmTicket")
     public ResponseEntity<?> bookTicket(@RequestBody @Valid ReservationCodeRequestDTO request) {
         try {
+            if (request.getCustomerDTO() == null || request.getTicketRequestDTO() == null || request.getTicketRequestDTO().isEmpty()) {
+                return ResponseEntity.status(400).body("Vui lòng cung cấp đầy đủ thông tin khách hàng và vé.");
+            }
+            if( request.getCustomerDTO().getFullName() == null || request.getCustomerDTO().getEmail() == null ||
+                    request.getCustomerDTO().getPhone() == null|| request.getCustomerDTO().getCccd() == null) {
+                return ResponseEntity.status(401).body("Vui lòng cung cấp đầy đủ thông tin khách hàng.");
+            }
+            if(!request.getCustomerDTO().getFullName().matches("^[\\p{L}\\s]+$")) {
+                return ResponseEntity.status(402).body("Tên khách hàng không hợp lệ. Vui lòng nhập tên hợp lệ.");
+            }
+            if(!request.getCustomerDTO().getEmail().matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+                return ResponseEntity.status(403).body("Email không hợp lệ. Vui lòng nhập email hợp lệ.");
+            }
+            if(!request.getCustomerDTO().getPhone().matches("^(0[3|5|7|8|9])+([0-9]{8})$")) {
+                return ResponseEntity.status(406).body("Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại hợp lệ.");
+            }
+            if(!request.getCustomerDTO().getCccd().matches("^\\d{12}$")) {
+                return ResponseEntity.status(405).body("CCCD không hợp lệ. Vui lòng nhập CCCD hợp lệ.");
+            }
             Customer customer = customerService.save(request.getCustomerDTO());
             BigDecimal totalPrice = BigDecimal.ZERO;
             for (TicketRequestDTO res : request.getTicketRequestDTO()) {
                 totalPrice = totalPrice.add(res.getTotalPrice());
             }
             ReservationCode reservationCode = reservationCodeService.save(totalPrice);
-            System.out.println(reservationCode);
+//            System.out.println(reservationCode);
             for (TicketRequestDTO res : request.getTicketRequestDTO()) {
+                if(res.getFullName()==null || res.getCccd() == null || res.getTicketType() == null) {
+                    return ResponseEntity.status(400).body("Vui lòng cung cấp đầy đủ thông tin vé.");
+                }
+                if(!res.getFullName().matches("^[\\p{L}\\s]+$")) {
+                    return ResponseEntity.status(402).body("Tên hành khách không hợp lệ. Vui lòng nhập tên hợp lệ.");
+                }
+                if(!res.getCccd().matches("^\\d{12}$")) {
+                    return ResponseEntity.status(405).body("CCCD hành khách không hợp lệ. Vui lòng nhập CCCD hợp lệ.");
+                }
                 PassengerDTO passengerDTO = new PassengerDTO();
                 passengerDTO.setTicketType(res.getTicketType());
                 passengerDTO.setCccd(res.getCccd());
@@ -102,6 +130,10 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
     @PostMapping("/reserve")
     public ResponseEntity<?> reserveTicket(@RequestBody @Valid TicketReservationReqDTO ticketReservationDTO){
         try{
+            if(ticketReservationDTO.getSeat() == null || ticketReservationDTO.getTrip() == null||
+                    ticketReservationDTO.getDepartureStation() == null || ticketReservationDTO.getArrivalStation() == null) {
+                return ResponseEntity.status(500).body("Vui lòng cung cấp đầy đủ thông tin");
+            }
             boolean isValid = ticketService.validateTicketReservation(ticketReservationDTO);
             if(isValid){
                 return ResponseEntity.status(400).body("Vé đã được giữ trước đó.");

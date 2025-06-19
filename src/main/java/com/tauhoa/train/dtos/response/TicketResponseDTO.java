@@ -3,11 +3,11 @@ package com.tauhoa.train.dtos.response;
 import com.tauhoa.train.models.Ticket;
 import lombok.*;
 
- @Getter
- @Builder
- @Setter
-
+@Getter
+@Builder
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class TicketResponseDTO {
     private int ticketId;
     private int tripId;
