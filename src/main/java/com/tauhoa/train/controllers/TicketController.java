@@ -7,6 +7,7 @@ import com.tauhoa.train.models.*;
 import com.tauhoa.train.services.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/tickets")
@@ -57,40 +59,52 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
     @PostMapping("/confirmTicket")
     public ResponseEntity<?> bookTicket(@RequestBody @Valid ReservationCodeRequestDTO request) {
         try {
+            log.info("Yêu cầu xác nhận đặt vé: {}", request);
             if (request.getCustomerDTO() == null || request.getTicketRequestDTO() == null || request.getTicketRequestDTO().isEmpty()) {
+                log.warn("Thông tin khách hàng hoặc vé bị thiếu.");
                 return ResponseEntity.status(400).body("Vui lòng cung cấp đầy đủ thông tin khách hàng và vé.");
             }
             if( request.getCustomerDTO().getFullName() == null || request.getCustomerDTO().getEmail() == null ||
                     request.getCustomerDTO().getPhone() == null|| request.getCustomerDTO().getCccd() == null) {
+                log.warn("Thông tin khách hàng không đầy đủ: {}", request.getCustomerDTO());
                 return ResponseEntity.status(401).body("Vui lòng cung cấp đầy đủ thông tin khách hàng.");
             }
             if(!request.getCustomerDTO().getFullName().matches("^[\\p{L}\\s]+$")) {
+                log.warn("Tên khách hàng không hợp lệ: {}", request.getCustomerDTO().getFullName());
                 return ResponseEntity.status(402).body("Tên khách hàng không hợp lệ. Vui lòng nhập tên hợp lệ.");
             }
             if(!request.getCustomerDTO().getEmail().matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+                log.warn("Email khách hàng không hợp lệ: {}", request.getCustomerDTO().getEmail());
                 return ResponseEntity.status(403).body("Email không hợp lệ. Vui lòng nhập email hợp lệ.");
             }
             if(!request.getCustomerDTO().getPhone().matches("^(0[3|5|7|8|9])+([0-9]{8})$")) {
+                log.warn("Số điện thoại khách hàng không hợp lệ: {}", request.getCustomerDTO().getPhone());
                 return ResponseEntity.status(406).body("Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại hợp lệ.");
             }
             if(!request.getCustomerDTO().getCccd().matches("^\\d{12}$")) {
+                log.warn("CCCD khách hàng không hợp lệ: {}", request.getCustomerDTO().getCccd());
                 return ResponseEntity.status(405).body("CCCD không hợp lệ. Vui lòng nhập CCCD hợp lệ.");
             }
             Customer customer = customerService.save(request.getCustomerDTO());
+            log.info("Đã lưu khách hàng: {}", customer);
             BigDecimal totalPrice = BigDecimal.ZERO;
             for (TicketRequestDTO res : request.getTicketRequestDTO()) {
                 totalPrice = totalPrice.add(res.getTotalPrice());
             }
             ReservationCode reservationCode = reservationCodeService.save(totalPrice);
-//            System.out.println(reservationCode);
+            log.info("Đã tạo mã đặt chỗ: {}", reservationCode);
+
             for (TicketRequestDTO res : request.getTicketRequestDTO()) {
                 if(res.getFullName()==null || res.getCccd() == null || res.getTicketType() == null) {
-                    return ResponseEntity.status(400).body("Vui lòng cung cấp đầy đủ thông tin vé.");
+                    log.warn("Thiếu thông hành khách: {}", res);
+                    return ResponseEntity.status(400).body("Vui lòng cung cấp đầy đủ thông tin hành khách.");
                 }
                 if(!res.getFullName().matches("^[\\p{L}\\s]+$")) {
+                    log.warn("Tên hành khách không hợp lệ: {}", res.getFullName());
                     return ResponseEntity.status(402).body("Tên hành khách không hợp lệ. Vui lòng nhập tên hợp lệ.");
                 }
                 if(!res.getCccd().matches("^\\d{12}$")) {
+                    log.warn("CCCD hành khách không hợp lệ: {}", res.getCccd());
                     return ResponseEntity.status(405).body("CCCD hành khách không hợp lệ. Vui lòng nhập CCCD hợp lệ.");
                 }
                 PassengerDTO passengerDTO = new PassengerDTO();
@@ -98,7 +112,9 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
                 passengerDTO.setCccd(res.getCccd());
                 passengerDTO.setFullName(res.getFullName());
                 Passenger passenger = passengerService.save(passengerDTO);
+                log.info("Đã lưu hành khách: {}", passenger);
                 ticketService.save(res, customer, passenger,reservationCode);
+                log.info("Đã lưu vé cho hành khách: {}", passengerDTO.getFullName());
             }
             emailService.sendTicketEmail(customer,reservationCode.getReservationCodeId());
             BookingResponse response = new BookingResponse();
@@ -106,6 +122,7 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
             response.setMessage("Đặt vé thành công");
             return ResponseEntity.status(200).body(response);
         }catch (Exception e) {
+            log.error("Lỗi khi đặt vé", e);
             BookingResponse response = new BookingResponse();
             response.setStatus("error");
             response.setMessage("Đặt vé thất bại!");
@@ -130,17 +147,28 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
     @PostMapping("/reserve")
     public ResponseEntity<?> reserveTicket(@RequestBody @Valid TicketReservationReqDTO ticketReservationDTO){
         try{
+            log.info("Yêu cầu giữ vé: {}", ticketReservationDTO);
             if(ticketReservationDTO.getSeat() == null || ticketReservationDTO.getTrip() == null||
                     ticketReservationDTO.getDepartureStation() == null || ticketReservationDTO.getArrivalStation() == null) {
+                log.warn("Thiếu thông tin giữ vé.");
                 return ResponseEntity.status(500).body("Vui lòng cung cấp đầy đủ thông tin");
+            }
+            if(ticketReservationDTO.getSeat() < 1 || ticketReservationDTO.getTrip() <1 ){
+
+                log.warn("Thông tin giữ vé không hợp lệ: {}", ticketReservationDTO);
+                return ResponseEntity.status(500).body("Thông tin giữ vé không hợp lệ.");
+
             }
             boolean isValid = ticketService.validateTicketReservation(ticketReservationDTO);
             if(isValid){
+                log.info("Vé đã được giữ trước đó: {}", ticketReservationDTO.getSeat());
                 return ResponseEntity.status(400).body("Vé đã được giữ trước đó.");
             }
             TicketResponseDTO ticket = ticketService.saveReservation(ticketReservationDTO);
+            log.info("Giữ vé thành công: {}", ticket);
             return ResponseEntity.status(200).body(ticket);
         } catch (Exception e){
+            log.error("Lỗi khi giữ vé", e);
             return ResponseEntity.status(500).body(e.getMessage());
         }
 
@@ -148,14 +176,27 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
     @PostMapping("/deleteReserve")
     public ResponseEntity<?> deleteTicketReservation(@RequestBody @Valid TicketReservationReqDTO ticketReservationDTO){
         try {
+            if(ticketReservationDTO.getSeat() == null || ticketReservationDTO.getTrip() == null||
+                    ticketReservationDTO.getDepartureStation() == null || ticketReservationDTO.getArrivalStation() == null) {
+                log.info("Yêu cầu huỷ giữ vé: {}", ticketReservationDTO);
+                return ResponseEntity.status(500).body("Vui lòng cung cấp đầy đủ thông tin");
+            }
+            if(ticketReservationDTO.getSeat() < 1 || ticketReservationDTO.getTrip() <1 ){
+
+                log.warn("Thông tin hủy giữ vé không hợp lệ: {}", ticketReservationDTO);
+                return ResponseEntity.status(500).body("Thông tin hủy giữ vé không hợp lệ.");
+
+            }
             ticketService.deleteTicket(ticketReservationDTO);
 
             // Trả về đối tượng BookingResponse thay vì chuỗi văn bản
             BookingResponse response = new BookingResponse();
             response.setStatus("success");
             response.setMessage("Hủy giữ vé thành công!");
+            log.info("Huỷ giữ vé thành công cho seat {}", ticketReservationDTO.getSeat());
             return ResponseEntity.status(200).body(response);
         } catch (Exception e){
+            log.error("Lỗi khi huỷ giữ vé", e);
             // Trả về đối tượng BookingResponse với thông báo lỗi
             BookingResponse errorResponse = new BookingResponse();
             errorResponse.setStatus("error");
@@ -205,7 +246,6 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
     @GetMapping("/searchTicketByIdAndroid")
     public ResponseEntity<?> searchTicketByIdAndroid(@RequestParam int ticketId) {
         try {
-            System.out.println(ticketId);
             Ticket ticket = ticketService.findByTicketId(ticketId);
             SearchTicketResponse searchTicketResponse = new SearchTicketResponse(ticket.getTicketId(),
                     ticket.getPassenger().getFullname(),
@@ -213,8 +253,10 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
                     ticket.getArrivalStation().getStationName(),
                     ticket.getSeat().getSeatNumber(),
                     ticket.getTrip().getTrain().getTrainName());
+            log.info("Đã tìm thấy vé : {}", searchTicketResponse);
             return ResponseEntity.ok(searchTicketResponse);
         } catch (RuntimeException e) {
+            log.warn("Không tìm thấy vé với ID: {}", ticketId, e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Không tìm thấy vé với ID: " + ticketId);
         }
@@ -224,7 +266,12 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
     public ResponseEntity<?> searchTicketByReservationCodeAndroid(@RequestParam int reservationCode) {
         try {
             List<Ticket> tickets = ticketService.findByReservationCode(reservationCode);
+            if (tickets.isEmpty()) {
+                log.info("Không tìm thấy vé cho mã đặt chỗ: {}", reservationCode);
+                return ResponseEntity.noContent().build();
+            }
             List<SearchTicketResponse> ticketResponseDTOList = new ArrayList<>();
+
             for (Ticket ticket : tickets) {
                 SearchTicketResponse searchTicketResponse = new SearchTicketResponse(ticket.getTicketId(),
                         ticket.getPassenger().getFullname(),
@@ -234,11 +281,10 @@ public ResponseEntity<List<TicketResponseDTO>> getAllTickets() {
                         ticket.getTrip().getTrain().getTrainName());
                 ticketResponseDTOList.add(searchTicketResponse);
             }
-            if (tickets.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            }
+            log.info("Đã tìm thấy  {} vé cho mã đặt chỗ {}", tickets.size(), reservationCode);
             return ResponseEntity.ok(ticketResponseDTOList);
         } catch (RuntimeException e) {
+            log.warn("Lỗi khi tìm kiếm vé với mã đặt chỗ: {}", reservationCode, e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Không tìm thấy vé với mã đặt vé: " + reservationCode);
         }

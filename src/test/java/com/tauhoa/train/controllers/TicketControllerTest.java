@@ -4,6 +4,7 @@ package com.tauhoa.train.controllers;
 import com.tauhoa.train.dtos.request.CustomerDTO;
 import com.tauhoa.train.dtos.request.ReservationCodeRequestDTO;
 import com.tauhoa.train.dtos.request.TicketRequestDTO;
+import com.tauhoa.train.dtos.request.TicketReservationReqDTO;
 import com.tauhoa.train.dtos.response.BookingResponse;
 import com.tauhoa.train.models.Customer;
 import com.tauhoa.train.models.Passenger;
@@ -20,7 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-
+import static org.mockito.Mockito.reset;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +38,7 @@ public class TicketControllerTest {
 
     @Mock
     private TicketService ticketService;
+
     @Mock
     private CustomerService customerService;
     @Mock
@@ -46,45 +48,28 @@ public class TicketControllerTest {
     @Mock
     private EmailService emailService;
 
-    private ReservationCodeRequestDTO validRequest;
-    @RegisterExtension
-    TestWatcher watcher = new TestWatcher() {
-        @Override
-        public void testSuccessful(ExtensionContext context) {
-            System.out.println("PASSED: " + context.getDisplayName());
-        }
 
-        @Override
-        public void testFailed(ExtensionContext context, Throwable cause) {
-            System.out.println("FAILED: " + context.getDisplayName());
-        }
 
-        @Override
-        public void testDisabled(ExtensionContext context, Optional<String> reason) {
-            System.out.println("DISABLED: " + context.getDisplayName() + " reason: " + reason.orElse("No reason"));
-        }
-    };
-    @BeforeEach
-    void setUp() {
-        validRequest = new ReservationCodeRequestDTO();
+
+    private ReservationCodeRequestDTO setUp(String nameCustomer, String email, String phone, String cccd ,String namePassenger, String cccdPassenger, BigDecimal totalPrice, TicketType ticketType) {
+        ReservationCodeRequestDTO validRequest = new ReservationCodeRequestDTO();
         CustomerDTO customerDTO = new CustomerDTO();
-        customerDTO.setFullName("Trịnh Huy Hoàng");
-        customerDTO.setEmail("abc@example.com");
-        customerDTO.setPhone("0912345678");
-        customerDTO.setCccd("012345678901");
+        customerDTO.setFullName(nameCustomer);
+        customerDTO.setEmail(email);
+        customerDTO.setPhone(phone);
+        customerDTO.setCccd(cccd);
 
         TicketRequestDTO ticket = new TicketRequestDTO();
-        ticket.setFullName("Trịnh Huy Hoàng");
-        ticket.setCccd("012345678901");
-        ticket.setTicketType(new TicketType(1,"Người lớn", BigDecimal.valueOf(0)));
-        ticket.setTotalPrice(BigDecimal.valueOf(100000));
+        ticket.setFullName(namePassenger);
+        ticket.setCccd(cccdPassenger);
+        ticket.setTicketType(ticketType);
+        ticket.setTotalPrice(totalPrice);
 
         validRequest.setCustomerDTO(customerDTO);
         validRequest.setTicketRequestDTO(List.of(ticket));
+        return validRequest;
     }
-
-    @Test
-    void bookTicket_whenValid_shouldReturnSuccess() {
+    void bookTicket_whenValid_shouldReturnSuccess(int expectedStatus, ReservationCodeRequestDTO validRequest) {
         Customer mockCustomer = new Customer();
         ReservationCode mockReservation = new ReservationCode();
         mockReservation.setReservationCodeId(1);
@@ -97,116 +82,217 @@ public class TicketControllerTest {
 
         ResponseEntity<?> response = ticketController.bookTicket(validRequest);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(expectedStatus, response.getStatusCodeValue());
         BookingResponse body = (BookingResponse) response.getBody();
         assertEquals("success", body.getStatus());
         assertEquals("Đặt vé thành công", body.getMessage());
     }
 
-    @Test
-    void bookTicket_whenMissingCustomerEmail_shouldReturn401() {
+    void bookTicket_whenMissingCustomerEmail_shouldReturn401(int expectedStatus, ReservationCodeRequestDTO validRequest) {
         validRequest.getCustomerDTO().setEmail(null);
 
         ResponseEntity<?> response = ticketController.bookTicket(validRequest);
 
-        assertEquals(401, response.getStatusCodeValue());
+        assertEquals(expectedStatus, response.getStatusCodeValue());
     }
-    @Test
-    void bookTicket_whenMissingCustomerSDT_shouldReturn401() {
+    void bookTicket_whenMissingCustomerSDT_shouldReturn401(int expectedStatus, ReservationCodeRequestDTO validRequest) {
         validRequest.getCustomerDTO().setPhone(null);
 
         ResponseEntity<?> response = ticketController.bookTicket(validRequest);
 
-        assertEquals(401, response.getStatusCodeValue());
+        assertEquals(expectedStatus, response.getStatusCodeValue());
     }
-    @Test
-    void bookTicket_whenMissingCustomerCccd_shouldReturn401() {
+    void bookTicket_whenMissingCustomerCccd_shouldReturn401(int expectedStatus, ReservationCodeRequestDTO validRequest) {
         validRequest.getCustomerDTO().setCccd(null);
 
         ResponseEntity<?> response = ticketController.bookTicket(validRequest);
 
-        assertEquals(401, response.getStatusCodeValue());
+        assertEquals(expectedStatus, response.getStatusCodeValue());
     }
-    @Test
-    void bookTicket_whenMissingCustomerFullName_shouldReturn401() {
+    void bookTicket_whenMissingCustomerFullName_shouldReturn401(int expectedStatus, ReservationCodeRequestDTO validRequest) {
         validRequest.getCustomerDTO().setFullName(null);
 
         ResponseEntity<?> response = ticketController.bookTicket(validRequest);
 
-        assertEquals(401, response.getStatusCodeValue());
+        assertEquals(expectedStatus, response.getStatusCodeValue());
     }
-    @Test
-    void bookTicket_whenInvalidCustomerFullName_shouldReturn402() {
-        validRequest.getCustomerDTO().setFullName(null);
+    void bookTicket_whenInvalidCustomerFullName_shouldReturn402(int expectedStatus, ReservationCodeRequestDTO validRequest) {
 
         ResponseEntity<?> response = ticketController.bookTicket(validRequest);
 
-        assertEquals(401, response.getStatusCodeValue());
+        assertEquals(expectedStatus, response.getStatusCodeValue());
     }
 
-    @Test
-    void bookTicket_whenInvalidEmail_shouldReturn403() {
-        validRequest.getCustomerDTO().setEmail("invalid-email");
+    void bookTicket_whenInvalidEmail_shouldReturn403(int expectedStatus, ReservationCodeRequestDTO validRequest) {
 
         ResponseEntity<?> response = ticketController.bookTicket(validRequest);
 
-        assertEquals(403, response.getStatusCodeValue());
+        assertEquals(expectedStatus, response.getStatusCodeValue());
     }
 
-    @Test
-    void bookTicket_whenInvalidPhone_shouldReturn406() {
-        validRequest.getCustomerDTO().setPhone("123");
+    void bookTicket_whenInvalidPhone_shouldReturn406(int expectedStatus, ReservationCodeRequestDTO validRequest) {
 
         ResponseEntity<?> response = ticketController.bookTicket(validRequest);
 
-        assertEquals(406, response.getStatusCodeValue());
+        assertEquals(expectedStatus, response.getStatusCodeValue());
     }
 
-    @Test
-    void bookTicket_whenInvalidCccd_shouldReturn405() {
-        validRequest.getCustomerDTO().setCccd("123");
+    void bookTicket_whenInvalidCccd_shouldReturn405(int expectedStatus, ReservationCodeRequestDTO validRequest) {
 
         ResponseEntity<?> response = ticketController.bookTicket(validRequest);
 
-        assertEquals(405, response.getStatusCodeValue());
+        assertEquals(expectedStatus, response.getStatusCodeValue());
     }
 
-    @Test
-    void bookTicket_whenMissingTicketInfo_shouldReturn400() {
-        validRequest.setTicketRequestDTO(null);
+
+
+    void bookTicket_whenPassengerInvalidFullName_shouldReturn402(int expectedStatus, ReservationCodeRequestDTO validRequest) {
+
+        when(customerService.save(any())).thenReturn(new Customer());
+        when(reservationCodeService.save(any())).thenReturn(new ReservationCode());
 
         ResponseEntity<?> response = ticketController.bookTicket(validRequest);
 
-        assertEquals(400, response.getStatusCodeValue());
+        assertEquals(expectedStatus, response.getStatusCodeValue());
     }
 
-    @Test
-    void bookTicket_whenPassengerInvalidFullName_shouldReturn402() {
-        validRequest.getTicketRequestDTO().get(0).setFullName("1234");
+    void bookTicket_whenPassengerInvalidCccd_shouldReturn405(int expectedStatus, ReservationCodeRequestDTO validRequest) {
+        when(customerService.save(any())).thenReturn(new Customer());
+        when(reservationCodeService.save(any())).thenReturn(new ReservationCode());
 
         ResponseEntity<?> response = ticketController.bookTicket(validRequest);
 
-        assertEquals(402, response.getStatusCodeValue());
+        assertEquals(expectedStatus, response.getStatusCodeValue());
     }
 
-    @Test
-    void bookTicket_whenPassengerInvalidCccd_shouldReturn405() {
-        validRequest.getTicketRequestDTO().get(0).setCccd("abc");
-
-        ResponseEntity<?> response = ticketController.bookTicket(validRequest);
-
-        assertEquals(405, response.getStatusCodeValue());
-    }
-
-    @Test
-    void bookTicket_whenExceptionThrown_shouldReturn500() {
+    void bookTicket_whenExceptionThrown_shouldReturn500(int expectedStatus, ReservationCodeRequestDTO validRequest) {
         when(customerService.save(any())).thenThrow(new RuntimeException("DB error"));
 
         ResponseEntity<?> response = ticketController.bookTicket(validRequest);
 
-        assertEquals(500, response.getStatusCodeValue());
+        assertEquals(expectedStatus, response.getStatusCodeValue());
         BookingResponse body = (BookingResponse) response.getBody();
         assertEquals("error", body.getStatus());
         assertEquals("Đặt vé thất bại!", body.getMessage());
     }
+    void bookTicket_whenMissingTicketInfo_shouldReturn400(int expectedStatus, ReservationCodeRequestDTO validRequest) {
+        validRequest.setTicketRequestDTO(null);
+
+        ResponseEntity<?> response = ticketController.bookTicket(validRequest);
+
+        assertEquals(expectedStatus, response.getStatusCodeValue());
+    }
+
+    String nameCus="Trịnh Huy Hoàng";
+    String email = "abc@example.com";
+    String Phone="0912345678";
+    String cccd = "012345678901";
+
+
+    String namePass = "Trịnh Huy Hoàng";
+    String cccdPass = "012345678901";
+    TicketType ticketType =    new TicketType(1,"Người lớn", BigDecimal.valueOf(0));
+    BigDecimal TotalPrice=BigDecimal.valueOf(100000);
+
+    @Test
+    void confirmTicket() {
+        ReservationCodeRequestDTO validRequest = setUp(nameCus, email, Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenValid_shouldReturnSuccess(200, validRequest);
+
+        bookTicket_whenExceptionThrown_shouldReturn500( 500,  validRequest);
+        validRequest = setUp(nameCus, email, Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenMissingCustomerEmail_shouldReturn401(401, validRequest);
+        validRequest = setUp(nameCus, email, Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenMissingCustomerSDT_shouldReturn401(401, validRequest);
+        validRequest = setUp(nameCus, email, Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenMissingCustomerCccd_shouldReturn401(401, validRequest);
+        validRequest = setUp(nameCus, email, Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenMissingCustomerFullName_shouldReturn401(401, validRequest);
+        validRequest = setUp("123hinag", email, Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidCustomerFullName_shouldReturn402(402, validRequest);
+        validRequest = setUp(nameCus, "email", Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidEmail_shouldReturn403(403, validRequest);
+        validRequest = setUp(nameCus, email, "123", cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidPhone_shouldReturn406(406, validRequest);
+        validRequest = setUp(nameCus, email, Phone, "123", namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidCccd_shouldReturn405(405, validRequest);
+        validRequest = setUp(nameCus, email, Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenMissingTicketInfo_shouldReturn400(400, validRequest);
+        reset(customerService);
+        ReservationCodeRequestDTO validRequest2 = setUp(nameCus, email, Phone, cccd, "123jhdas", cccdPass, TotalPrice, ticketType);
+        bookTicket_whenPassengerInvalidFullName_shouldReturn402(402, validRequest2);
+        ReservationCodeRequestDTO validRequest3 = setUp(nameCus, email, Phone, cccd, namePass, "cccdPass", TotalPrice, ticketType);
+        bookTicket_whenPassengerInvalidCccd_shouldReturn405(405, validRequest3);
+        reset(customerService);
+        validRequest = setUp("+++++", email, Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidCustomerFullName_shouldReturn402(402, validRequest);
+        validRequest = setUp(nameCus, "+++++", Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidEmail_shouldReturn403(403, validRequest);
+        validRequest = setUp(nameCus, email, "hoang", cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidPhone_shouldReturn406(406, validRequest);
+        validRequest = setUp(nameCus, email, Phone, "hoang", namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidCccd_shouldReturn405(405, validRequest);
+        reset(customerService);
+         validRequest2 = setUp(nameCus, email, Phone, cccd, "=====", cccdPass, TotalPrice, ticketType);
+        bookTicket_whenPassengerInvalidFullName_shouldReturn402(402, validRequest2);
+         validRequest3 = setUp(nameCus, email, Phone, cccd, namePass, "hoang", TotalPrice, ticketType);
+        bookTicket_whenPassengerInvalidCccd_shouldReturn405(405, validRequest3);
+        reset(customerService);
+        validRequest = setUp(";;;;;;;", email, Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidCustomerFullName_shouldReturn402(402, validRequest);
+        validRequest = setUp(nameCus, "hoang", Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidEmail_shouldReturn403(403, validRequest);
+        validRequest = setUp(nameCus, email, ";[;[", cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidPhone_shouldReturn406(406, validRequest);
+        validRequest = setUp(nameCus, email, Phone, "[][]]", namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidCccd_shouldReturn405(405, validRequest);
+        reset(customerService);
+        validRequest2 = setUp(nameCus, email, Phone, cccd, "[][]]", cccdPass, TotalPrice, ticketType);
+        bookTicket_whenPassengerInvalidFullName_shouldReturn402(402, validRequest2);
+        validRequest3 = setUp(nameCus, email, Phone, cccd, namePass, "123edd", TotalPrice, ticketType);
+        bookTicket_whenPassengerInvalidCccd_shouldReturn405(405, validRequest3);
+        reset(customerService);
+        validRequest = setUp("1qwd1", email, Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidCustomerFullName_shouldReturn402(402, validRequest);
+        validRequest = setUp(nameCus, "22ee", Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidEmail_shouldReturn403(403, validRequest);
+        validRequest = setUp(nameCus, email, "*****", cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidPhone_shouldReturn406(406, validRequest);
+        validRequest = setUp(nameCus, email, Phone, "$$$$", namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidCccd_shouldReturn405(405, validRequest);
+        reset(customerService);
+        validRequest2 = setUp(nameCus, email, Phone, cccd, "&&&&", cccdPass, TotalPrice, ticketType);
+        bookTicket_whenPassengerInvalidFullName_shouldReturn402(402, validRequest2);
+        validRequest3 = setUp(nameCus, email, Phone, cccd, namePass, "!!!!!", TotalPrice, ticketType);
+        bookTicket_whenPassengerInvalidCccd_shouldReturn405(405, validRequest3);
+        reset(customerService);
+        validRequest = setUp("!!@#", email, Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidCustomerFullName_shouldReturn402(402, validRequest);
+        validRequest = setUp(nameCus, "_)_)", Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidEmail_shouldReturn403(403, validRequest);
+        validRequest = setUp(nameCus, email, "||||", cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidPhone_shouldReturn406(406, validRequest);
+        validRequest = setUp(nameCus, email, Phone, "|}|}", namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidCccd_shouldReturn405(405, validRequest);
+        reset(customerService);
+        validRequest2 = setUp(nameCus, email, Phone, cccd, "}|}|", cccdPass, TotalPrice, ticketType);
+        bookTicket_whenPassengerInvalidFullName_shouldReturn402(402, validRequest2);
+        validRequest3 = setUp(nameCus, email, Phone, cccd, namePass, "}}}|", TotalPrice, ticketType);
+        bookTicket_whenPassengerInvalidCccd_shouldReturn405(405, validRequest3);
+        reset(customerService);
+        validRequest = setUp("}|||", email, Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidCustomerFullName_shouldReturn402(402, validRequest);
+        validRequest = setUp(nameCus, "}|||", Phone, cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidEmail_shouldReturn403(403, validRequest);
+        validRequest = setUp(nameCus, email, "|}}}", cccd, namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidPhone_shouldReturn406(406, validRequest);
+        validRequest = setUp(nameCus, email, Phone, "123qweqwe", namePass, cccdPass, TotalPrice, ticketType);
+        bookTicket_whenInvalidCccd_shouldReturn405(405, validRequest);
+        reset(customerService);
+        validRequest2 = setUp(nameCus, email, Phone, cccd, "~~~", cccdPass, TotalPrice, ticketType);
+        bookTicket_whenPassengerInvalidFullName_shouldReturn402(402, validRequest2);
+        validRequest3 = setUp(nameCus, email, Phone, cccd, namePass, "~```1``", TotalPrice, ticketType);
+        bookTicket_whenPassengerInvalidCccd_shouldReturn405(405, validRequest3);
+    }
+
 }
